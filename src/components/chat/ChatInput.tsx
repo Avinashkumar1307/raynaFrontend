@@ -80,27 +80,32 @@ export default function ChatInput({ onSend, disabled }: ChatInputProps) {
   }, [isListening, startListening, stopListening, clearTranscript]);
 
   return (
-        <div className="p-3 sm:p-4 md:p-5 md:px-6 border-t border-[var(--border-color)]">
+        <div className="sticky bottom-0 left-0 right-0 z-10 p-2 sm:p-3 md:p-4 md:px-6 border-t border-[var(--border-color)] bg-[var(--bg-primary)]/95 backdrop-blur supports-[backdrop-filter]:bg-[var(--bg-primary)]/80 pb-[max(env(safe-area-inset-bottom),8px)]">
       <div className="flex items-end gap-2 sm:gap-3 max-w-3xl mx-auto">
-                <div className="flex-1 glass rounded-xl focus-within:border-amber-500/40 focus-within:shadow-[0_0_15px_rgba(245,158,11,0.1)] transition-all relative">
+                <div className="flex-1 glass rounded-2xl focus-within:border-amber-500/40 focus-within:shadow-[0_0_15px_rgba(245,158,11,0.1)] transition-all relative px-3 sm:px-4 py-2 sm:py-2.5">
           <div className="flex items-center">
             <textarea
-              ref={textareaRef}
-              value={input}
-              onChange={handleChange}
-              onKeyDown={handleKeyDown}
-              placeholder={isListening ? "Listening... speak now" : "Ask about Dubai tours, Singapore activities, travel plans..."}
-              disabled={disabled || isListening}
-              rows={1}
-              className="w-full resize-none bg-transparent p-3 sm:p-4 pr-10 sm:pr-12 text-sm text-[var(--text-primary)] placeholder-[var(--text-secondary)] focus:outline-none disabled:opacity-40 border-[1px] border-[var(--border-color)] focus:border-amber-500/40 rounded-3xl transition-colors"
-            />
+  ref={textareaRef}
+  value={input}
+  onChange={handleChange}
+  onKeyDown={handleKeyDown}
+  placeholder={isListening ? "Listening... speak now" : "Ask about Dubai tours, Singapore activities, travel plans..."}
+  disabled={disabled || isListening}
+  rows={1}
+  className="w-full resize-none bg-transparent p-0 pr-12 sm:pr-14 
+             text-sm sm:text-base 
+             placeholder:text-sm sm:placeholder:text-base
+             text-[var(--text-primary)] 
+             placeholder-[var(--text-secondary)] 
+             focus:outline-none disabled:opacity-40 transition-colors"
+/>
             {/* Microphone button */}
             {isSpeechSupported && (
               <button
                 type="button"
                 onClick={handleMicClick}
                 disabled={disabled}
-                className={`absolute right-2 sm:right-3 p-1.5 sm:p-2 rounded-full transition-all ${
+                className={`absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all ${
                                     isListening
                     ? 'bg-red-500 text-white animate-pulse shadow-lg shadow-red-500/30'
                     : 'bg-[var(--bg-card)] hover:bg-[var(--border-color)] text-[var(--text-secondary)] border border-[var(--border-color)]'
@@ -134,7 +139,7 @@ export default function ChatInput({ onSend, disabled }: ChatInputProps) {
         <button
           onClick={handleSend}
           disabled={disabled || !input.trim()}
-          className="rounded-xl bg-linear-to-r from-amber-500 to-orange-500 p-2.5 sm:p-3 md:p-3.5 text-white hover:from-amber-400 hover:to-orange-400 disabled:opacity-30 transition-all shrink-0 shadow-lg shadow-amber-500/20 disabled:shadow-none"
+          className="rounded-xl bg-linear-to-r from-amber-500 to-orange-500 p-2.5 sm:p-3 md:p-3.5 text-white hover:from-amber-400 hover:to-orange-400 disabled:opacity-30 transition-all shrink-0 shadow-lg shadow-amber-500/20 disabled:shadow-none tappable"
           aria-label="Send message"
         >
           <svg

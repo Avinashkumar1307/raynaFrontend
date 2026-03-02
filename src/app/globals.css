@@ -175,8 +175,8 @@ body {
     scroll-behavior: smooth;
   }
   
-  /* Better tap targets for mobile */
-  button {
+    /* Better tap targets for mobile (opt-in via .tappable) */
+  .tappable {
     min-height: 44px;
     min-width: 44px;
   }
