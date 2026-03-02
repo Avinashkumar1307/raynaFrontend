@@ -19,7 +19,7 @@ export default function TourCard({ card }: Props) {
       target="_blank"
       rel="noopener noreferrer"
       onClick={handleClick}
-      className="group flex-shrink-0 w-64 sm:w-72 snap-center rounded-2xl overflow-hidden border border-[var(--border-color)] bg-[var(--bg-primary)] shadow-sm hover:shadow-lg hover:border-amber-400/30 transition-all focus:outline-none focus:ring-2 focus:ring-amber-400 transform hover:scale-[1.02]"
+              className="group flex-shrink-0 w-64 sm:w-72 snap-center rounded-2xl overflow-hidden border border-[var(--border-color)] bg-[var(--bg-primary)] shadow-sm hover:shadow-lg hover:border-gray-400/30 transition-all focus:outline-none focus:ring-2 focus:ring-gray-400 transform hover:scale-[1.02]"
     >
               <div className="relative h-36 sm:h-40 w-full bg-gray-100 overflow-hidden">
         {card.image ? (
@@ -36,10 +36,10 @@ export default function TourCard({ card }: Props) {
           />
         ) : null}
         <div 
-          className="h-full w-full flex flex-col items-center justify-center text-xs text-[var(--text-secondary)] bg-gradient-to-br from-amber-50 to-orange-50 dark:from-slate-800 dark:to-slate-700"
+          className="h-full w-full flex flex-col items-center justify-center text-xs text-[var(--text-secondary)] bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-700"
           style={{ display: card.image ? 'none' : 'flex' }}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 mb-2 text-amber-400">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 mb-2 text-gray-600">
             <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
           </svg>
           <span className="font-medium">{card.category || 'Tour'}</span>
@@ -64,7 +64,7 @@ export default function TourCard({ card }: Props) {
         <div className="flex items-center justify-between">
           <div className="text-xs text-[var(--text-secondary)] truncate max-w-[65%]">{card.location}</div>
           {typeof card.rating === "number" ? (
-            <div className="text-xs font-medium text-amber-600">★ {card.rating.toFixed(1)}</div>
+            <div className="text-xs font-medium text-gray-700">★ {card.rating.toFixed(1)}</div>
           ) : null}
         </div>
 
@@ -84,7 +84,7 @@ export default function TourCard({ card }: Props) {
             {card.highlights.slice(0, 3).map((h) => (
               <span
                 key={h}
-                className="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-800"
+                className="text-[10px] px-2 py-0.5 rounded-full bg-gray-50 dark:bg-gray-900/30 text-gray-700 dark:text-gray-400 border border-gray-100 dark:border-gray-800"
               >
                 {h}
               </span>
@@ -93,7 +93,7 @@ export default function TourCard({ card }: Props) {
         ) : null}
 
         <div className="mt-3">
-          <span className="inline-flex items-center justify-center w-full text-xs font-semibold text-white bg-linear-to-r from-amber-500 to-orange-500 rounded-lg py-2 group-hover:from-amber-600 group-hover:to-orange-600">
+                      <span className="inline-flex items-center justify-center w-full text-xs font-semibold text-white bg-gradient-to-r from-gray-800 to-gray-900 rounded-lg py-2 group-hover:from-gray-700 group-hover:to-gray-800">
             View details
           </span>
         </div>

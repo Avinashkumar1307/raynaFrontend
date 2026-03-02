@@ -54,7 +54,7 @@ function formatInline(text: string, keyPrefix: string) {
           href={url}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-amber-400 underline underline-offset-2 hover:text-amber-300 transition-colors break-all"
+                      className="text-gray-600 underline underline-offset-2 hover:text-gray-500 transition-colors break-all"
         >
           {displayUrl}
         </a>
@@ -105,7 +105,7 @@ export default function MessageBubble({ message, animate = false }: MessageBubbl
     <div className={`flex ${isUser ? "justify-end" : "justify-start"} message-enter`}>
       {/* Assistant avatar */}
       {!isUser && (
-        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white text-xs font-bold mr-2 sm:mr-3 mt-1 shrink-0 shadow-lg shadow-amber-500/20">
+        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center text-white text-xs font-bold mr-2 sm:mr-3 mt-1 shrink-0 shadow-lg shadow-gray-500/20">
           R
         </div>
       )}
@@ -113,7 +113,7 @@ export default function MessageBubble({ message, animate = false }: MessageBubbl
       {/* Message bubble */}
       <div
         className={`max-w-[85%] sm:max-w-[80%] px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl ${isUser
-            ? "bg-[#030f0a] text-white rounded-br-sm shadow-lg shadow-amber-500/20"
+                          ? "bg-gray-800 text-white rounded-br-sm shadow-lg shadow-gray-500/20"
             : "glass text-[var(--text-primary)] rounded-bl-sm"
           }`}
       >

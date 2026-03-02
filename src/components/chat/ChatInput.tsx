@@ -82,7 +82,7 @@ export default function ChatInput({ onSend, disabled }: ChatInputProps) {
   return (
         <div className="sticky bottom-0 left-0 right-0 z-10 p-2 sm:p-3 md:p-4 md:px-6 border-t border-[var(--border-color)] bg-[var(--bg-primary)]/95 backdrop-blur supports-[backdrop-filter]:bg-[var(--bg-primary)]/80 pb-[max(env(safe-area-inset-bottom),8px)]">
       <div className="flex items-end gap-2 sm:gap-3 max-w-3xl mx-auto">
-                <div className="flex-1 glass rounded-2xl focus-within:border-amber-500/40 focus-within:shadow-[0_0_15px_rgba(245,158,11,0.1)] transition-all relative px-3 sm:px-4 py-2 sm:py-2.5">
+                <div className="flex-1 glass rounded-2xl focus-within:border-gray-500/40 focus-within:shadow-[0_0_15px_rgba(31,41,55,0.1)] transition-all relative px-3 sm:px-4 py-2 sm:py-2.5">
           <div className="flex items-center">
             <textarea
   ref={textareaRef}
@@ -139,7 +139,7 @@ export default function ChatInput({ onSend, disabled }: ChatInputProps) {
         <button
           onClick={handleSend}
           disabled={disabled || !input.trim()}
-          className="rounded-xl bg-linear-to-r from-amber-500 to-orange-500 p-2.5 sm:p-3 md:p-3.5 text-white hover:from-amber-400 hover:to-orange-400 disabled:opacity-30 transition-all shrink-0 shadow-lg shadow-amber-500/20 disabled:shadow-none tappable"
+          className="rounded-xl bg-gradient-to-r from-gray-800 to-gray-900 p-2.5 sm:p-3 md:p-3.5 text-white hover:from-gray-700 hover:to-gray-800 disabled:opacity-30 transition-all shrink-0 shadow-lg shadow-gray-500/20 disabled:shadow-none tappable"
           aria-label="Send message"
         >
           <svg

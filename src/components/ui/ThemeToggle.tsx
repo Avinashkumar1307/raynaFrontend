@@ -8,7 +8,7 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-lg glass glass-hover transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amber-400/50 tappable"
+      className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-lg glass glass-hover transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-400/50 tappable"
       title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
       aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
     >
@@ -20,7 +20,7 @@ export default function ThemeToggle() {
           viewBox="0 0 24 24"
           strokeWidth={1.5}
           stroke="currentColor"
-          className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400"
+          className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700"
         >
           <path
             strokeLinecap="round"

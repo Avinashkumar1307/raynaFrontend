@@ -29,7 +29,7 @@ const FEATURES = [
 
 export default function Sidebar({ onOpenChat }: SidebarProps) {
   return (
-    <div className="relative flex flex-col w-full h-full bg-gradient-to-br from-amber-500 via-orange-500 to-rose-500 text-white overflow-y-auto">
+          <div className="relative flex flex-col w-full h-full bg-gradient-to-br from-gray-800 via-gray-900 to-black text-white overflow-y-auto">
       {/* Decorative circles */}
       <div className="absolute top-[-80px] right-[-80px] w-64 h-64 bg-white/10 rounded-full" />
       <div className="absolute bottom-[-40px] left-[-40px] w-48 h-48 bg-white/10 rounded-full" />
@@ -75,7 +75,7 @@ export default function Sidebar({ onOpenChat }: SidebarProps) {
         {/* Mobile CTA */}
         <button
           onClick={onOpenChat}
-          className="md:hidden w-full py-3 bg-white text-amber-600 font-semibold rounded-xl hover:bg-white/90 transition-colors shadow-lg"
+                      className="md:hidden w-full py-3 bg-white text-gray-800 font-semibold rounded-xl hover:bg-white/90 transition-colors shadow-lg"
         >
           Start Chatting
         </button>

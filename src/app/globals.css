@@ -8,8 +8,8 @@
   --border-color: rgba(0, 0, 0, 0.08);
   --text-primary: #1e293b;
   --text-secondary: #64748b;
-  --accent: #f59e0b;
-  --accent-glow: rgba(245, 158, 11, 0.15);
+  --accent: #1f2937;
+  --accent-glow: rgba(31, 41, 55, 0.15);
 }
 
 .dark {
@@ -20,8 +20,8 @@
   --border-color: rgba(255, 255, 255, 0.08);
   --text-primary: #f0f0f5;
   --text-secondary: #8a8a9a;
-  --accent: #f59e0b;
-  --accent-glow: rgba(245, 158, 11, 0.15);
+  --accent: #374151;
+  --accent-glow: rgba(55, 65, 81, 0.15);
 }
 
 body {
@@ -100,8 +100,8 @@ body {
 }
 
 .glass-hover:hover {
-  background: rgba(245, 158, 11, 0.08);
-  border-color: rgba(245, 158, 11, 0.3);
+  background: rgba(31, 41, 55, 0.08);
+  border-color: rgba(31, 41, 55, 0.3);
 }
 
 .dark .glass-hover:hover {
@@ -109,9 +109,9 @@ body {
 }
 
 /* Glow effect */
-.glow-amber {
-  box-shadow: 0 0 20px rgba(245, 158, 11, 0.15),
-              0 0 40px rgba(245, 158, 11, 0.05);
+.glow-black {
+  box-shadow: 0 0 20px rgba(31, 41, 55, 0.15),
+              0 0 40px rgba(31, 41, 55, 0.05);
 }
 
 /* Chat scrolling improvements */
@@ -129,12 +129,12 @@ body {
 }
 
 .chat-container::-webkit-scrollbar-thumb {
-  background: rgba(245, 158, 11, 0.3);
+  background: rgba(31, 41, 55, 0.3);
   border-radius: 3px;
 }
 
 .chat-container::-webkit-scrollbar-thumb:hover {
-  background: rgba(245, 158, 11, 0.5);
+  background: rgba(31, 41, 55, 0.5);
 }
 
 /* Theme-aware scrollbars */

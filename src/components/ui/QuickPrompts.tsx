@@ -3,9 +3,9 @@
 const PROMPTS = [
   { text: "Show me Dubai tours", icon: "🏙️" },
   { text: "Desert safari tours in Dubai", icon: "🐪" },
-  { text: "Water activities in Dubai", icon: "🏄" },
-  { text: "Dubai city tour packages", icon: "🚌" },
-  { text: "Burj Khalifa tickets", icon: "🏒" },
+  { text: "Singapore city attractions", icon: "🇸🇬" },
+  { text: "Thailand tour packages", icon: "🏝️" },
+  { text: "Turkey travel experiences", icon: "🕌" },
   { text: "What destinations do you cover?", icon: "🌍" },
 ];
 
@@ -33,7 +33,7 @@ export default function QuickPrompts({ onSelect }: QuickPromptsProps) {
           <button
             key={prompt.text}
             onClick={() => onSelect(prompt.text)}
-            className="flex items-center gap-2 sm:gap-3 text-left text-xs sm:text-sm px-3 sm:px-4 py-3 sm:py-3.5 rounded-xl glass glass-hover transition-all text-[var(--text-primary)] hover:text-amber-500 group"
+            className="flex items-center gap-2 sm:gap-3 text-left text-xs sm:text-sm px-3 sm:px-4 py-3 sm:py-3.5 rounded-xl glass glass-hover transition-all text-[var(--text-primary)] hover:text-gray-700 group"
           >
                         <span className="text-base sm:text-lg group-hover:scale-110 transition-transform flex-shrink-0">
               {prompt.icon}
