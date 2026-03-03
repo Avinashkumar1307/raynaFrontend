@@ -3,7 +3,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { api } from "@/lib/api";
 import { getSessionId, setSessionId, clearSessionId } from "@/lib/session";
-import { HISTORY_LIMIT } from "@/lib/constants";
 import { parseTourDataFromText, createMockTourCarousel, parseJsonTourData } from "@/lib/tourUtils";
 import type { Message } from "@/lib/types";
 
@@ -12,22 +11,48 @@ export function useChat() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(false);
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
+  // Only true when a brand-new assistant reply arrives via sendMessage (not history loads)
+  const [shouldAnimateNewMessage, setShouldAnimateNewMessage] = useState(false);
 
   // On mount: restore chat history if we have a saved session
   useEffect(() => {
     const sessionId = getSessionId();
     if (sessionId) {
+      setCurrentSessionId(sessionId);
       api
-        .getHistory(sessionId, HISTORY_LIMIT)
+        .getConversationDetail(sessionId)
         .then((data) => {
           if (data.messages.length > 0) {
-            setMessages(data.messages);
+            setMessages(data.messages.map((m) => ({
+              ...m,
+              tourCarousel: m.tourCarousel ?? undefined,
+            })));
           }
         })
         .catch(() => {
           // Session expired server-side, clear stale ID
           clearSessionId();
+          setCurrentSessionId(null);
         });
+    }
+  }, []);
+
+  const loadConversation = useCallback(async (sessionId: string) => {
+    setIsLoading(true);
+    try {
+      const data = await api.getConversationDetail(sessionId);
+      setMessages(data.messages.map((m) => ({
+        ...m,
+        tourCarousel: m.tourCarousel ?? undefined,
+      })));
+      setSessionId(sessionId);
+      setCurrentSessionId(sessionId);
+      setShouldScrollToBottom(true);
+    } catch {
+      // Silently fail — conversation may be deleted or DB unavailable
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
@@ -45,36 +70,37 @@ export function useChat() {
 
       // Persist session ID
       setSessionId(response.session_id);
+      setCurrentSessionId(response.session_id);
 
-                  // Process the response to extract or create tour carousel
+      // Process the response to extract or create tour carousel
       let tourCarousel = response.tourCarousel;
       let processedContent = response.message;
-      
-                                                      // Enhanced tour detection - show carousel for both actual data AND tour questions
+
+      // Enhanced tour detection - show carousel for both actual data AND tour questions
       const hasRealTourData = !tourCarousel && response.message && (
         // JSON tour data detection (when backend returns structured data)
         response.message.includes('"type":"tour_carousel"') ||
         response.message.includes('"cards":[') ||
         response.message.includes('```json') ||
         (response.message.includes('"title"') && response.message.includes('"image"') && response.message.includes('"url"')) ||
-        
+
         // Emoji-structured format detection (Singapore/other destinations)
         (response.message.includes('⭐') && response.message.includes('💰') && response.message.includes('🔗') && response.message.includes('---')) ||
-        
+
         // Table format detection with actual tour data
         (response.message.includes('|---|') && (
-          response.message.includes('AED ') || 
+          response.message.includes('AED ') ||
           response.message.includes('USD ') ||
           response.message.includes('SGD ') ||
           response.message.includes('INR ')
         )) ||
-        
+
         // Structured tour listings with prices and ratings
         (response.message.match(/\|[^|]+\|[^|]+\|[^|]+\|[^|]+\|[^|]+\|/) && (
           response.message.includes('⭐') || response.message.includes('★')
         ))
       );
-      
+
       // Also check if user is asking about tours (even without structured data)
       const isTourQuestion = !tourCarousel && !hasRealTourData && content.toLowerCase().includes('tour') && (
         content.toLowerCase().includes('dubai') ||
@@ -89,20 +115,20 @@ export function useChat() {
         content.toLowerCase().includes('what') ||
         content.toLowerCase().includes('which')
       );
-      
-                  if (hasRealTourData || isTourQuestion) {
-                // First try to parse JSON tour data (priority)
+
+      if (hasRealTourData || isTourQuestion) {
+        // First try to parse JSON tour data (priority)
         tourCarousel = parseJsonTourData(response.message) || undefined;
-        
+
         // If no JSON found, try to parse table format
         if (!tourCarousel) {
           tourCarousel = parseTourDataFromText(response.message) || undefined;
         }
-        
+
         // If still no data but user asked a tour question, show relevant tours
         if (!tourCarousel && isTourQuestion) {
           let carouselTitle = 'Featured Tours';
-          
+
           if (content.toLowerCase().includes('dubai')) {
             carouselTitle = 'Dubai Tours';
             if (content.toLowerCase().includes('desert')) {
@@ -119,16 +145,16 @@ export function useChat() {
           } else if (content.toLowerCase().includes('malaysia')) {
             carouselTitle = 'Malaysia Tours';
           }
-          
+
           tourCarousel = createMockTourCarousel(carouselTitle);
-          
+
           // Add helpful message for tour questions
           if (!processedContent.toLowerCase().includes('here are')) {
             processedContent = `Yes! Here are some popular ${carouselTitle.toLowerCase()} available:\n\n${processedContent}`;
           }
         }
-        
-                        // Clean up the message content when we have tour data
+
+        // Clean up the message content when we have tour data
         if (tourCarousel) {
           // Remove various tour data formats from the text
           processedContent = response.message
@@ -144,7 +170,7 @@ export function useChat() {
             .replace(/\n{3,}/g, '\n\n') // Clean up excessive newlines
             .replace(/\s*\n\s*\n\s*/g, '\n\n') // Normalize spacing
             .trim();
-            
+
           // If content is mostly empty after cleaning, provide a better message
           if (!processedContent || processedContent.length < 80) {
             const location = tourCarousel.cards[0]?.location || 'your destination';
@@ -152,9 +178,7 @@ export function useChat() {
           }
         }
       }
-      
-            // Tour carousel now supports multiple destinations dynamically
-      
+
       // Add assistant response
       const assistantMsg: Message = {
         role: "assistant",
@@ -163,12 +187,13 @@ export function useChat() {
       };
       setMessages((prev) => [...prev, assistantMsg]);
       setShouldScrollToBottom(true);
-        } catch (err) {
+      setShouldAnimateNewMessage(true); // only real-time replies animate
+    } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Something went wrong";
-      
+
       let chatErrorMessage: string;
-      
+
       if (errorMessage.includes("Too many")) {
         chatErrorMessage = "I'm receiving messages too quickly. Please wait a moment before sending another message. 🕐";
       } else if (errorMessage.includes("timeout") || errorMessage.includes("ECONNABORTED")) {
@@ -180,15 +205,15 @@ export function useChat() {
       } else {
         chatErrorMessage = "I encountered an issue processing your request. Please try rephrasing your question or visit raynatours.com for assistance. 💫";
       }
-      
+
       // Add error as assistant message instead of showing error banner
       const errorMsg: Message = {
         role: "assistant",
         content: chatErrorMessage,
       };
-            setMessages((prev) => [...prev, errorMsg]);
+      setMessages((prev) => [...prev, errorMsg]);
       setShouldScrollToBottom(true);
-      
+
       // Clear any existing error state
       setError(null);
     } finally {
@@ -208,6 +233,7 @@ export function useChat() {
     clearSessionId();
     setMessages([]);
     setError(null);
+    setCurrentSessionId(null);
   }, []);
 
   // Reset scroll trigger after it's been consumed
@@ -215,13 +241,22 @@ export function useChat() {
     setShouldScrollToBottom(false);
   }, []);
 
-  return { 
-    messages, 
-    isLoading, 
-    error, 
-    sendMessage, 
-    clearChat, 
+  // Reset animation trigger after ChatPanel consumes it
+  const consumeAnimationTrigger = useCallback(() => {
+    setShouldAnimateNewMessage(false);
+  }, []);
+
+  return {
+    messages,
+    isLoading,
+    error,
+    sendMessage,
+    clearChat,
+    loadConversation,
+    currentSessionId,
     shouldScrollToBottom,
-    consumeScrollTrigger 
+    shouldAnimateNewMessage,
+    consumeScrollTrigger,
+    consumeAnimationTrigger,
   };
 }

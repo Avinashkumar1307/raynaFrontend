@@ -50,6 +50,62 @@ export interface HistoryResponse {
   messages: Message[];
 }
 
+// New history API types
+export interface ConversationSummary {
+  session_id: string;
+  title: string;
+  message_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ConversationListResponse {
+  conversations: ConversationSummary[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    pages: number;
+  };
+}
+
+export interface ConversationDetailResponse {
+  session_id: string;
+  title: string;
+  created_at: string;
+  messages: Message[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    pages: number;
+  };
+}
+
+export interface Conversion {
+  amount: number;
+  fromCurrency: string;
+  toCurrency: string;
+  convertedAmount: number;
+  exchangeRate: number;
+  timestamp: string;
+}
+
+export interface SessionConversionsResponse {
+  session_id: string;
+  conversions: Conversion[];
+}
+
+export interface AllConversionsResponse {
+  conversions: (Conversion & { session_id: string })[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    pages: number;
+  };
+}
+
 export interface ErrorResponse {
   error: string;
   details?: string;

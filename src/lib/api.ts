@@ -1,4 +1,12 @@
-import type { ChatResponse, HistoryResponse, HealthResponse } from "./types";
+import type {
+  ChatResponse,
+  HistoryResponse,
+  HealthResponse,
+  ConversationListResponse,
+  ConversationDetailResponse,
+  SessionConversionsResponse,
+  AllConversionsResponse,
+} from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -51,5 +59,28 @@ export const api = {
 
   healthCheck() {
     return request<HealthResponse>("/api/chat/health");
+  },
+
+  // History API
+  getConversations(page = 1, limit = 20) {
+    return request<ConversationListResponse>(`/api/history?page=${page}&limit=${limit}`);
+  },
+
+  getConversationDetail(sessionId: string, page = 1, limit = 50) {
+    return request<ConversationDetailResponse>(`/api/history/${sessionId}?page=${page}&limit=${limit}`);
+  },
+
+  deleteConversation(sessionId: string) {
+    return request<{ success: boolean; message: string }>(`/api/history/${sessionId}`, {
+      method: "DELETE",
+    });
+  },
+
+  getSessionConversions(sessionId: string) {
+    return request<SessionConversionsResponse>(`/api/history/${sessionId}/conversions`);
+  },
+
+  getAllConversions(page = 1, limit = 20) {
+    return request<AllConversionsResponse>(`/api/history/conversions/all?page=${page}&limit=${limit}`);
   },
 };
