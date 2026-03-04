@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { api } from "@/lib/api";
 import { getSessionId, setSessionId, clearSessionId } from "@/lib/session";
-import { parseTourDataFromText, createMockTourCarousel, parseJsonTourData } from "@/lib/tourUtils";
+import { parseTourDataFromText, createMockTourCarousel, parseJsonTourData, processAssistantContent } from "@/lib/tourUtils";
 import type { Message } from "@/lib/types";
 
 export function useChat() {
@@ -14,6 +14,8 @@ export function useChat() {
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   // Only true when a brand-new assistant reply arrives via sendMessage (not history loads)
   const [shouldAnimateNewMessage, setShouldAnimateNewMessage] = useState(false);
+  // Increments every time the active conversation changes so ChatPanel can reset animatingIndex
+  const [conversationKey, setConversationKey] = useState(0);
 
   // On mount: restore chat history if we have a saved session
   useEffect(() => {
@@ -24,10 +26,13 @@ export function useChat() {
         .getConversationDetail(sessionId)
         .then((data) => {
           if (data.messages.length > 0) {
-            setMessages(data.messages.map((m) => ({
-              ...m,
-              tourCarousel: m.tourCarousel ?? undefined,
-            })));
+            setMessages(data.messages.map((m) => {
+              if (m.role === "assistant") {
+                const { content, tourCarousel } = processAssistantContent(m.content, m.tourCarousel);
+                return { role: m.role, content, tourCarousel };
+              }
+              return { role: m.role as "user", content: m.content };
+            }));
           }
         })
         .catch(() => {
@@ -40,12 +45,16 @@ export function useChat() {
 
   const loadConversation = useCallback(async (sessionId: string) => {
     setIsLoading(true);
+    setConversationKey((k) => k + 1); // signal ChatPanel to reset animatingIndex
     try {
       const data = await api.getConversationDetail(sessionId);
-      setMessages(data.messages.map((m) => ({
-        ...m,
-        tourCarousel: m.tourCarousel ?? undefined,
-      })));
+      setMessages(data.messages.map((m) => {
+        if (m.role === "assistant") {
+          const { content, tourCarousel } = processAssistantContent(m.content, m.tourCarousel);
+          return { role: m.role, content, tourCarousel };
+        }
+        return { role: m.role as "user", content: m.content };
+      }));
       setSessionId(sessionId);
       setCurrentSessionId(sessionId);
       setShouldScrollToBottom(true);
@@ -78,6 +87,10 @@ export function useChat() {
 
       // Enhanced tour detection - show carousel for both actual data AND tour questions
       const hasRealTourData = !tourCarousel && response.message && (
+        // Backend <tour-carousel> tag format (highest priority)
+        response.message.includes('<tour-carousel') ||
+        // {{CAROUSEL: {...}}} format
+        response.message.includes('{{CAROUSEL:') ||
         // JSON tour data detection (when backend returns structured data)
         response.message.includes('"type":"tour_carousel"') ||
         response.message.includes('"cards":[') ||
@@ -158,6 +171,8 @@ export function useChat() {
         if (tourCarousel) {
           // Remove various tour data formats from the text
           processedContent = response.message
+            .replace(/<tour-carousel[\s\S]*?<\/tour-carousel>/g, '') // Remove backend tag
+            .replace(/\{\{CAROUSEL:[\s\S]*?\}\}\}/g, '')             // Remove {{CAROUSEL: ...}}} block
             .replace(/```json[\s\S]*?```/g, '') // Remove JSON code blocks
             .replace(/\{[\s\S]*?"type"\s*:\s*"tour_carousel"[\s\S]*?\}/g, '') // Remove raw JSON
             .replace(/---[\s\S]*?(?=\n\n|Would you like|$)/g, '') // Remove emoji-structured tour data
@@ -166,6 +181,10 @@ export function useChat() {
             .replace(/\|---|/g, '') // Remove table separators
             .replace(/-{3,}/g, '') // Remove separator lines
             .replace(/#{1,3}\s*[^\n]+/g, '') // Remove markdown headers
+            .replace(/^\*{0,2}\d+\..*$/gm, '')  // Remove numbered list items (1. or **1.)
+            .replace(/^[^\n]*(?:💰|🔗|⏱️)\s*.+$/gm, '')  // Remove price/link/duration emoji lines
+            .replace(/^[^\n]*⭐[^\n]*\|[^\n]*$/gm, '')    // Remove rating|separator lines
+            .replace(/^https?:\/\/\S+\s*$/gm, '')         // Remove standalone URL lines
             .replace(/Would you like to:[\s\S]*$/g, '') // Remove follow-up questions
             .replace(/\n{3,}/g, '\n\n') // Clean up excessive newlines
             .replace(/\s*\n\s*\n\s*/g, '\n\n') // Normalize spacing
@@ -234,6 +253,7 @@ export function useChat() {
     setMessages([]);
     setError(null);
     setCurrentSessionId(null);
+    setConversationKey((k) => k + 1); // signal ChatPanel to reset animatingIndex
   }, []);
 
   // Reset scroll trigger after it's been consumed
@@ -254,6 +274,7 @@ export function useChat() {
     clearChat,
     loadConversation,
     currentSessionId,
+    conversationKey,
     shouldScrollToBottom,
     shouldAnimateNewMessage,
     consumeScrollTrigger,

@@ -17,6 +17,7 @@ export default function Home() {
     clearChat,
     loadConversation,
     currentSessionId,
+    conversationKey,
     shouldScrollToBottom,
     shouldAnimateNewMessage,
     consumeScrollTrigger,
@@ -87,6 +88,7 @@ export default function Home() {
           messages={messages}
           isLoading={isLoading}
           error={error}
+          conversationKey={conversationKey}
           shouldScrollToBottom={shouldScrollToBottom}
           shouldAnimateNewMessage={shouldAnimateNewMessage}
           onSendMessage={handleSendMessage}

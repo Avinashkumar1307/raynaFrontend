@@ -1,8 +1,105 @@
 import type { TourCard, TourCarousel } from './types';
 
+// Strip markdown bold/italic markers from a string (e.g. **Title** → Title)
+function stripMd(s: string): string {
+  return s.replace(/\*\*/g, '').replace(/\*/g, '').trim();
+}
+
 // Parse JSON tour data from response text
 export function parseJsonTourData(text: string): TourCarousel | null {
   try {
+    // Method 0: Parse <tour-carousel data='...'></tour-carousel> tag (backend's preferred format)
+    const tourTagMatch =
+      text.match(/<tour-carousel\s+data='([\s\S]*?)'>\s*<\/tour-carousel>/) ||
+      text.match(/<tour-carousel\s+data="([\s\S]*?)">\s*<\/tour-carousel>/);
+    if (tourTagMatch) {
+      const jsonData = JSON.parse(tourTagMatch[1]);
+      if (jsonData.cards && Array.isArray(jsonData.cards)) {
+        return {
+          type: 'tour_carousel',
+          title: jsonData.title || 'Featured Tours',
+          subtitle: jsonData.subtitle,
+          totalResults: jsonData.cards.length,
+          cards: jsonData.cards.map((card: Record<string, unknown>, i: number) => ({
+            id: String(card.id ?? `card-${i}`),
+            title: String(card.title ?? ''),
+            slug: String(card.id ?? String(card.title ?? '').toLowerCase().replace(/[^a-z0-9]+/g, '-')),
+            image: String(card.image ?? ''),
+            location: String(card.location ?? ''),
+            category: String(card.category ?? 'Tours'),
+            originalPrice: (card.originalPrice as number) ?? null,
+            currentPrice: (card.currentPrice as number) ?? 0,
+            currency: String(card.currency ?? 'AED'),
+            discountPercentage: card.discountPercentage as number | undefined,
+            isRecommended: card.isRecommended as boolean | undefined,
+            isNew: card.isNew as boolean | undefined,
+            rating: card.rating as number | undefined,
+            reviewCount: card.reviewCount as number | undefined,
+            duration: card.duration as string | undefined,
+            highlights: (card.highlights as string[]) ?? [],
+            url: String(card.url ?? ''),
+          })),
+        };
+      }
+    }
+
+    // Method 0b: Parse {{CAROUSEL: {...}}} format
+    const carouselMarker = '{{CAROUSEL:';
+    const markerIdx = text.indexOf(carouselMarker);
+    if (markerIdx !== -1) {
+      const jsonStart = text.indexOf('{', markerIdx + carouselMarker.length);
+      if (jsonStart !== -1) {
+        let braceCount = 0;
+        let endIdx = jsonStart;
+        let inStr = false;
+        let esc = false;
+        for (let i = jsonStart; i < text.length; i++) {
+          const ch = text[i];
+          if (esc) { esc = false; continue; }
+          if (ch === '\\') { esc = true; continue; }
+          if (ch === '"') { inStr = !inStr; continue; }
+          if (!inStr) {
+            if (ch === '{') braceCount++;
+            else if (ch === '}') {
+              braceCount--;
+              if (braceCount === 0) { endIdx = i + 1; break; }
+            }
+          }
+        }
+        if (braceCount === 0 && endIdx > jsonStart) {
+          const jsonStr = text.substring(jsonStart, endIdx);
+          const jsonData = JSON.parse(jsonStr);
+          if (jsonData.cards && Array.isArray(jsonData.cards)) {
+            return {
+              type: 'tour_carousel',
+              title: jsonData.title || 'Featured Tours',
+              subtitle: jsonData.subtitle,
+              totalResults: jsonData.cards.length,
+              cards: jsonData.cards.map((card: Record<string, unknown>, i: number) => ({
+                id: String(card.id ?? `card-${i}`),
+                title: String(card.title ?? ''),
+                slug: String(card.id ?? String(card.title ?? '').toLowerCase().replace(/[^a-z0-9]+/g, '-')),
+                image: String(card.image ?? ''),
+                location: String(card.location ?? ''),
+                category: String(card.category ?? 'Tours'),
+                originalPrice: (card.originalPrice as number) ?? null,
+                currentPrice: (card.currentPrice as number) ?? 0,
+                currency: String(card.currency ?? 'AED'),
+                discountPercentage: card.discountPercentage as number | undefined,
+                isRecommended: card.isRecommended as boolean | undefined,
+                isNew: card.isNew as boolean | undefined,
+                rating: card.rating as number | undefined,
+                reviewCount: card.reviewCount as number | undefined,
+                duration: card.duration as string | undefined,
+                highlights: (card.highlights as string[]) ?? [],
+                url: String(card.url ?? ''),
+              })),
+            };
+          }
+        }
+      }
+    }
+
     // Method 1: Look for JSON in code blocks (```json)
     const codeBlockMatch = text.match(/```json\s*([\s\S]*?)\s*```/);
     if (codeBlockMatch) {
@@ -367,6 +464,69 @@ function getHighlightsFromTitle(title: string): string[] {
   if (titleLower.includes('singapore flyer')) return ['Giant Wheel', 'City Views', '30 Minutes'];
   if (titleLower.includes('zoo')) return ['Wildlife', 'Tram Ride', 'Family Fun'];
   return ['Great Experience', 'Professional Guide', 'Memorable'];
+}
+
+// Shared helper: extract carousel from raw assistant message content and clean the text.
+// Used by both sendMessage (live) and loadConversation (history restore).
+export function processAssistantContent(
+  rawContent: string,
+  existingCarousel?: TourCarousel | null
+): { content: string; tourCarousel: TourCarousel | undefined } {
+  // If the backend already provided a carousel, just return as-is
+  if (existingCarousel) {
+    return { content: rawContent, tourCarousel: existingCarousel };
+  }
+
+  const hasRealTourData =
+    rawContent.includes('<tour-carousel') ||           // backend tag format
+    rawContent.includes('{{CAROUSEL:') ||              // {{CAROUSEL: {...}}} format
+    rawContent.includes('"type":"tour_carousel"') ||
+    rawContent.includes('"cards":[') ||
+    rawContent.includes('```json') ||
+    (rawContent.includes('"title"') && rawContent.includes('"image"') && rawContent.includes('"url"')) ||
+    (rawContent.includes('⭐') && rawContent.includes('💰') && rawContent.includes('🔗') && rawContent.includes('---')) ||
+    (rawContent.includes('|---|') &&
+      (rawContent.includes('AED ') || rawContent.includes('USD ') || rawContent.includes('SGD ') || rawContent.includes('INR '))) ||
+    (!!rawContent.match(/\|[^|]+\|[^|]+\|[^|]+\|[^|]+\|[^|]+\|/) &&
+      (rawContent.includes('⭐') || rawContent.includes('★')));
+
+  if (!hasRealTourData) {
+    return { content: rawContent, tourCarousel: undefined };
+  }
+
+  const tourCarousel =
+    parseJsonTourData(rawContent) || parseTourDataFromText(rawContent) || undefined;
+
+  if (!tourCarousel) {
+    return { content: rawContent, tourCarousel: undefined };
+  }
+
+  let cleaned = rawContent
+    .replace(/<tour-carousel[\s\S]*?<\/tour-carousel>/g, '') // remove backend tag
+    .replace(/\{\{CAROUSEL:[\s\S]*?\}\}\}/g, '')             // remove {{CAROUSEL: ...}}} block
+    .replace(/```json[\s\S]*?```/g, '')
+    .replace(/\{[\s\S]*?"type"\s*:\s*"tour_carousel"[\s\S]*?\}/g, '')
+    .replace(/---[\s\S]*?(?=\n\n|Would you like|$)/g, '')
+    .replace(/🏙️[\s\S]*?🔗\s*https?:\/\/[^\s\n]+/g, '')
+    .replace(/\|[^|]+\|[^|]+\|[^|]+\|[^|]+\|[^|]+\|[^|]+\|/g, '')
+    .replace(/\|---|/g, '')
+    .replace(/-{3,}/g, '')
+    .replace(/#{1,3}\s*[^\n]+/g, '')
+    .replace(/^\*{0,2}\d+\..*$/gm, '')                       // remove numbered list items (1. or **1.)
+    .replace(/^[^\n]*(?:💰|🔗|⏱️)\s*.+$/gm, '')              // remove price/link/duration emoji lines
+    .replace(/^[^\n]*⭐[^\n]*\|[^\n]*$/gm, '')                // remove rating|separator lines
+    .replace(/^https?:\/\/\S+\s*$/gm, '')                    // remove standalone URL lines
+    .replace(/Would you like to:[\s\S]*$/g, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/\s*\n\s*\n\s*/g, '\n\n')
+    .trim();
+
+  if (!cleaned || cleaned.length < 80) {
+    const location = tourCarousel.cards[0]?.location || 'your destination';
+    cleaned = `Here are ${tourCarousel.cards.length} amazing tours in ${location}! 🎆✨\n\nBrowse through these exciting experiences and click any card to book:`;
+  }
+
+  return { content: cleaned, tourCarousel };
 }
 
 // Create a comprehensive tour database based on common Dubai tours

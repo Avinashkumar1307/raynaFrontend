@@ -15,6 +15,7 @@ interface ChatPanelProps {
   error: string | null;
   shouldScrollToBottom: boolean;
   shouldAnimateNewMessage: boolean;
+  conversationKey: number;
   onSendMessage: (content: string) => void;
   onClearChat: () => void;
   onScrollConsumed: () => void;
@@ -28,6 +29,7 @@ export default function ChatPanel({
   error,
   shouldScrollToBottom,
   shouldAnimateNewMessage,
+  conversationKey,
   onSendMessage,
   onClearChat,
   onScrollConsumed,
@@ -36,6 +38,11 @@ export default function ChatPanel({
 }: ChatPanelProps) {
   const [animatingIndex, setAnimatingIndex] = useState<number | null>(null);
 
+  // When conversation switches (load from history / new chat), clear any leftover animation
+  useEffect(() => {
+    setAnimatingIndex(null);
+  }, [conversationKey]);
+
   // Only animate when sendMessage produces a new reply — NOT when loading history
   useEffect(() => {
     if (!shouldAnimateNewMessage) return;
@@ -43,7 +50,7 @@ export default function ChatPanel({
     const lastMsg = messages[messages.length - 1];
     if (lastMsg.role === "assistant") {
       setAnimatingIndex(messages.length - 1);
-      onAnimationConsumed(); // reset the flag immediately
+      onAnimationConsumed();
     }
   }, [shouldAnimateNewMessage, messages, onAnimationConsumed]);
 
