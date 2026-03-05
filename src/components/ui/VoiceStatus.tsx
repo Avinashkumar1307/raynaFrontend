@@ -48,11 +48,11 @@ export default function VoiceStatus({
       </div>
 
       {/* Powered by ElevenLabs */}
-      {ttsSupported && (
+      {/* {ttsSupported && (
         <div className="ml-auto text-xs opacity-60">
           🎵 Powered by ElevenLabs
         </div>
-      )}
+      )} */}
     </div>
   );
 }
