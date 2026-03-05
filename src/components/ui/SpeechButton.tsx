@@ -2,12 +2,12 @@
 
 import { useCallback, useEffect } from 'react';
 import { useSpeechToText } from '@/hooks/useSpeechToText';
-import { useWhisperSTT } from '@/hooks/useWhisperSTT';
+import { useElevenLabsSTT } from '@/hooks/useElevenLabsSTT';
 
 interface SpeechButtonProps {
   onTranscript: (text: string) => void;
   disabled?: boolean;
-  mode?: 'browser' | 'whisper';
+  mode?: 'browser' | 'elevenlabs';
 }
 
 export default function SpeechButton({ 
@@ -31,22 +31,22 @@ export default function SpeechButton({
     language: 'en-US'
   });
 
-  // Whisper API (Premium)
+    // ElevenLabs API (Premium)
   const {
-    transcript: whisperTranscript,
-    isRecording: isWhisperRecording,
-    isProcessing: isWhisperProcessing,
-    startRecording: startWhisperRecording,
-    stopRecording: stopWhisperRecording,
-    clearTranscript: clearWhisperTranscript,
-    error: whisperError,
-    isSupported: isWhisperSupported
-  } = useWhisperSTT();
+    transcript: elevenLabsTranscript,
+    isRecording: isElevenLabsRecording,
+    isProcessing: isElevenLabsProcessing,
+    startRecording: startElevenLabsRecording,
+    stopRecording: stopElevenLabsRecording,
+    clearTranscript: clearElevenLabsTranscript,
+    error: elevenLabsError,
+    isSupported: isElevenLabsSupported
+  } = useElevenLabsSTT();
 
-  const isActive = mode === 'browser' ? isBrowserListening : (isWhisperRecording || isWhisperProcessing);
-  const currentTranscript = mode === 'browser' ? browserTranscript : whisperTranscript;
-  const currentError = mode === 'browser' ? browserError : whisperError;
-  const isSupported = mode === 'browser' ? isBrowserSupported : isWhisperSupported;
+    const isActive = mode === 'browser' ? isBrowserListening : (isElevenLabsRecording || isElevenLabsProcessing);
+  const currentTranscript = mode === 'browser' ? browserTranscript : elevenLabsTranscript;
+  const currentError = mode === 'browser' ? browserError : elevenLabsError;
+  const isSupported = mode === 'browser' ? isBrowserSupported : isElevenLabsSupported;
 
   const handleClick = useCallback(() => {
     if (disabled || !isSupported) return;
@@ -61,26 +61,26 @@ export default function SpeechButton({
         clearBrowserTranscript();
         startBrowserListening();
       }
-    } else {
-      if (isWhisperRecording) {
-        stopWhisperRecording();
+        } else {
+      if (isElevenLabsRecording) {
+        stopElevenLabsRecording();
       } else {
-        clearWhisperTranscript();
-        startWhisperRecording();
+        clearElevenLabsTranscript();
+        startElevenLabsRecording();
       }
     }
-  }, [mode, disabled, isSupported, isBrowserListening, isWhisperRecording, 
+    }, [mode, disabled, isSupported, isBrowserListening, isElevenLabsRecording, 
       startBrowserListening, stopBrowserListening, clearBrowserTranscript,
-      startWhisperRecording, stopWhisperRecording, clearWhisperTranscript,
+      startElevenLabsRecording, stopElevenLabsRecording, clearElevenLabsTranscript,
       browserTranscript, onTranscript]);
 
-  // Auto-send transcript when ready (for Whisper)
+    // Auto-send transcript when ready (for ElevenLabs)
   useEffect(() => {
-    if (mode === 'whisper' && whisperTranscript && !isWhisperRecording && !isWhisperProcessing) {
-      onTranscript(whisperTranscript);
-      clearWhisperTranscript();
+    if (mode === 'elevenlabs' && elevenLabsTranscript && !isElevenLabsRecording && !isElevenLabsProcessing) {
+      onTranscript(elevenLabsTranscript);
+      clearElevenLabsTranscript();
     }
-  }, [mode, whisperTranscript, isWhisperRecording, isWhisperProcessing, onTranscript, clearWhisperTranscript]);
+  }, [mode, elevenLabsTranscript, isElevenLabsRecording, isElevenLabsProcessing, onTranscript, clearElevenLabsTranscript]);
 
   if (!isSupported) {
     return null;
@@ -89,9 +89,9 @@ export default function SpeechButton({
   const getButtonState = () => {
     if (mode === 'browser') {
       return isBrowserListening ? 'listening' : 'idle';
-    } else {
-      if (isWhisperProcessing) return 'processing';
-      if (isWhisperRecording) return 'recording';
+        } else {
+      if (isElevenLabsProcessing) return 'processing';
+      if (isElevenLabsRecording) return 'recording';
       return 'idle';
     }
   };

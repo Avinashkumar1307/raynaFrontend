@@ -2,10 +2,10 @@
 
 import { useState } from 'react';
 import { useSpeechToText } from '@/hooks/useSpeechToText';
-import { useWhisperSTT } from '@/hooks/useWhisperSTT';
+import { useElevenLabsSTT } from '@/hooks/useElevenLabsSTT';
 
 export default function SpeechDemo() {
-  const [selectedMode, setSelectedMode] = useState<'browser' | 'whisper'>('browser');
+  const [selectedMode, setSelectedMode] = useState<'browser' | 'elevenlabs'>('browser');
   const [results, setResults] = useState<string[]>([]);
 
   const {
@@ -17,15 +17,15 @@ export default function SpeechDemo() {
     error: browserError
   } = useSpeechToText();
 
-  const {
-    transcript: whisperTranscript,
+    const {
+    transcript: elevenLabsTranscript,
     isRecording,
     isProcessing,
     startRecording,
     stopRecording,
-    error: whisperError,
-    isSupported: whisperSupported
-  } = useWhisperSTT();
+    error: elevenLabsError,
+    isSupported: elevenLabsSupported
+  } = useElevenLabsSTT();
 
   const handleBrowserComplete = () => {
     if (browserTranscript) {
@@ -33,9 +33,9 @@ export default function SpeechDemo() {
     }
   };
 
-  const handleWhisperComplete = () => {
-    if (whisperTranscript) {
-      setResults(prev => [...prev, `[Whisper] ${whisperTranscript}`]);
+    const handleElevenLabsComplete = () => {
+    if (elevenLabsTranscript) {
+      setResults(prev => [...prev, `[ElevenLabs] ${elevenLabsTranscript}`]);
     }
   };
 
@@ -61,16 +61,16 @@ export default function SpeechDemo() {
           </label>
           
           <label className="flex items-center gap-2">
-            <input
+                        <input
               type="radio"
-              value="whisper"
-              checked={selectedMode === 'whisper'}
-              onChange={(e) => setSelectedMode(e.target.value as 'whisper')}
-              disabled={!whisperSupported}
+              value="elevenlabs"
+              checked={selectedMode === 'elevenlabs'}
+              onChange={(e) => setSelectedMode(e.target.value as 'elevenlabs')}
+              disabled={!elevenLabsSupported}
             />
-            <span className={whisperSupported ? '' : 'opacity-50'}>
-              Whisper API (Premium)
-              {!whisperSupported && ' - Not supported'}
+            <span className={elevenLabsSupported ? '' : 'opacity-50'}>
+              ElevenLabs API (Premium)
+              {!elevenLabsSupported && ' - Not supported'}
             </span>
           </label>
         </div>
@@ -107,12 +107,12 @@ export default function SpeechDemo() {
         </div>
       )}
 
-      {/* Whisper Mode */}
-      {selectedMode === 'whisper' && whisperSupported && (
+            {/* ElevenLabs Mode */}
+      {selectedMode === 'elevenlabs' && elevenLabsSupported && (
         <div className="mb-6">
           <div className="flex flex-col items-center gap-4">
             <button
-              onClick={isRecording ? () => { stopRecording(); handleWhisperComplete(); } : startRecording}
+              onClick={isRecording ? () => { stopRecording(); handleElevenLabsComplete(); } : startRecording}
               disabled={isProcessing}
               className={`px-6 py-3 rounded-lg font-semibold ${
                 isProcessing
@@ -125,16 +125,16 @@ export default function SpeechDemo() {
               {isProcessing ? '⏳ Processing...' : isRecording ? '🔴 Stop Recording' : '🎤 Start Recording'}
             </button>
             
-            {whisperTranscript && (
+                        {elevenLabsTranscript && (
               <div className="p-3 bg-gray-100 rounded-lg w-full">
-                <p className="text-sm text-gray-600">Whisper Result:</p>
-                <p className="font-medium">{whisperTranscript}</p>
+                <p className="text-sm text-gray-600">ElevenLabs Result:</p>
+                <p className="font-medium">{elevenLabsTranscript}</p>
               </div>
             )}
             
-            {whisperError && (
+                        {elevenLabsError && (
               <div className="p-3 bg-red-100 rounded-lg w-full">
-                <p className="text-sm text-red-600">Error: {whisperError}</p>
+                <p className="text-sm text-red-600">Error: {elevenLabsError}</p>
               </div>
             )}
           </div>

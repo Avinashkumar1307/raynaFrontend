@@ -4,6 +4,8 @@ import { useState, useCallback, useEffect } from "react";
 import { api } from "@/lib/api";
 import { getSessionId, setSessionId, clearSessionId } from "@/lib/session";
 import { parseTourDataFromText, createMockTourCarousel, parseJsonTourData, processAssistantContent } from "@/lib/tourUtils";
+import { useElevenLabsTTS } from "@/hooks/useElevenLabsTTS";
+import { cleanTextForTTS, isTextSafeForTTS } from "@/utils/textCleaner";
 import type { Message } from "@/lib/types";
 
 export function useChat() {
@@ -16,6 +18,19 @@ export function useChat() {
   const [shouldAnimateNewMessage, setShouldAnimateNewMessage] = useState(false);
   // Increments every time the active conversation changes so ChatPanel can reset animatingIndex
   const [conversationKey, setConversationKey] = useState(0);
+  const [voiceEnabled, setVoiceEnabled] = useState(true); // Voice response setting
+
+  // Text-to-Speech for AI responses
+  const {
+    speak,
+    isPlaying,
+    isLoading: isTTSLoading,
+    stop: stopSpeaking,
+    error: ttsError,
+    isSupported: ttsSupported
+  } = useElevenLabsTTS();
+
+    
 
   // On mount: restore chat history if we have a saved session
   useEffect(() => {
@@ -198,7 +213,7 @@ export function useChat() {
         }
       }
 
-      // Add assistant response
+            // Add assistant response
       const assistantMsg: Message = {
         role: "assistant",
         content: processedContent,
@@ -207,6 +222,25 @@ export function useChat() {
       setMessages((prev) => [...prev, assistantMsg]);
       setShouldScrollToBottom(true);
       setShouldAnimateNewMessage(true); // only real-time replies animate
+
+                  // Speak the assistant's response if voice is enabled
+      if (voiceEnabled && ttsSupported && processedContent) {
+        const speechText = cleanTextForTTS(processedContent);
+        console.log('Original text:', processedContent.substring(0, 100));
+        console.log('Cleaned text for speech:', speechText.substring(0, 100));
+        
+        if (isTextSafeForTTS(speechText)) {
+          // Add a small delay to let the message render first
+          setTimeout(() => {
+            speak(speechText);
+          }, 300);
+        } else {
+          console.log('Text not safe for TTS:', { 
+            length: speechText.length, 
+            isEmpty: speechText.length === 0 
+          });
+        }
+      }
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Something went wrong";
@@ -225,13 +259,23 @@ export function useChat() {
         chatErrorMessage = "I encountered an issue processing your request. Please try rephrasing your question or visit raynatours.com for assistance. 💫";
       }
 
-      // Add error as assistant message instead of showing error banner
+            // Add error as assistant message instead of showing error banner
       const errorMsg: Message = {
         role: "assistant",
         content: chatErrorMessage,
       };
       setMessages((prev) => [...prev, errorMsg]);
       setShouldScrollToBottom(true);
+
+            // Speak error message if voice is enabled
+      if (voiceEnabled && ttsSupported) {
+        const speechText = cleanTextForTTS(chatErrorMessage);
+        if (isTextSafeForTTS(speechText)) {
+          setTimeout(() => {
+            speak(speechText);
+          }, 300);
+        }
+      }
 
       // Clear any existing error state
       setError(null);
@@ -240,7 +284,7 @@ export function useChat() {
     }
   }, []);
 
-  const clearChat = useCallback(async () => {
+    const clearChat = useCallback(async () => {
     const sessionId = getSessionId();
     if (sessionId) {
       try {
@@ -249,12 +293,26 @@ export function useChat() {
         // Ignore — session may already be expired
       }
     }
+    stopSpeaking(); // Stop any current speech
     clearSessionId();
     setMessages([]);
     setError(null);
     setCurrentSessionId(null);
     setConversationKey((k) => k + 1); // signal ChatPanel to reset animatingIndex
-  }, []);
+  }, [stopSpeaking]);
+
+  const toggleVoice = useCallback(() => {
+    setVoiceEnabled(prev => {
+      if (!prev) {
+        // Voice was just enabled, don't interrupt current speech
+        return true;
+      } else {
+        // Voice was just disabled, stop current speech
+        stopSpeaking();
+        return false;
+      }
+    });
+  }, [stopSpeaking]);
 
   // Reset scroll trigger after it's been consumed
   const consumeScrollTrigger = useCallback(() => {
@@ -266,7 +324,7 @@ export function useChat() {
     setShouldAnimateNewMessage(false);
   }, []);
 
-  return {
+    return {
     messages,
     isLoading,
     error,
@@ -279,5 +337,13 @@ export function useChat() {
     shouldAnimateNewMessage,
     consumeScrollTrigger,
     consumeAnimationTrigger,
+    // Voice functionality
+    voiceEnabled,
+    toggleVoice,
+    isPlaying,
+    isTTSLoading,
+    stopSpeaking,
+    ttsError,
+    ttsSupported,
   };
 }

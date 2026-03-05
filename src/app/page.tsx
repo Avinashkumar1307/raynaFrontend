@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useChat } from "@/hooks/useChat";
 import { useHistory } from "@/hooks/useHistory";
 import ChatPanel from "@/components/layout/ChatPanel";
@@ -8,8 +8,18 @@ import HistorySidebar from "@/components/layout/HistorySidebar";
 
 export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [speechSupported, setSpeechSupported] = useState(false);
 
-  const {
+  // Check browser speech support
+  useEffect(() => {
+    setSpeechSupported(
+      typeof window !== 'undefined' && 
+      'webkitSpeechRecognition' in window || 
+      'SpeechRecognition' in window
+    );
+  }, []);
+
+    const {
     messages,
     isLoading,
     error,
@@ -22,6 +32,14 @@ export default function Home() {
     shouldAnimateNewMessage,
     consumeScrollTrigger,
     consumeAnimationTrigger,
+    // Voice functionality
+    voiceEnabled,
+    toggleVoice,
+    isPlaying,
+    isTTSLoading,
+    stopSpeaking,
+    ttsError,
+    ttsSupported,
   } = useChat();
 
   const {
@@ -84,7 +102,7 @@ export default function Home() {
       />
 
       <div className="flex-1 min-w-0 flex flex-col h-full">
-        <ChatPanel
+                <ChatPanel
           messages={messages}
           isLoading={isLoading}
           error={error}
@@ -96,8 +114,15 @@ export default function Home() {
           onScrollConsumed={consumeScrollTrigger}
           onAnimationConsumed={consumeAnimationTrigger}
           onOpenSidebar={() => setSidebarOpen(true)}
+          voiceEnabled={voiceEnabled}
+          onToggleVoice={toggleVoice}
+          isPlaying={isPlaying}
+          isTTSLoading={isTTSLoading}
+                    onStopSpeaking={stopSpeaking}
+          ttsSupported={ttsSupported}
+          speechSupported={speechSupported}
         />
-      </div>
+                  </div>
     </main>
   );
 }

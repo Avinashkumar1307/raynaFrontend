@@ -7,13 +7,22 @@ import { useSpeechToText } from "@/hooks/useSpeechToText";
 interface ChatInputProps {
   onSend: (message: string) => void;
   disabled: boolean;
+  voiceEnabled?: boolean;
+  isPlaying?: boolean;
+  isTTSLoading?: boolean;
 }
 
-export default function ChatInput({ onSend, disabled }: ChatInputProps) {
+export default function ChatInput({ 
+  onSend, 
+  disabled, 
+  voiceEnabled = false,
+  isPlaying = false,
+  isTTSLoading = false 
+}: ChatInputProps) {
   const [input, setInput] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   
-  // Speech-to-text functionality
+      // Browser Speech-to-text functionality (more reliable)
   const {
     transcript,
     isListening,
@@ -27,6 +36,12 @@ export default function ChatInput({ onSend, disabled }: ChatInputProps) {
     interimResults: true,
     language: 'en-US'
   });
+
+  // For compatibility with the existing code
+  const isRecording = isListening;
+  const isProcessing = false;
+  const startRecording = startListening;
+  const stopRecording = stopListening;
 
     const handleSend = useCallback(() => {
     const trimmed = input.trim();
@@ -57,7 +72,7 @@ export default function ChatInput({ onSend, disabled }: ChatInputProps) {
     }
   };
 
-  // Update input when speech transcript changes
+      // Update input when speech transcript changes
   useEffect(() => {
     if (transcript) {
       setInput(transcript);
@@ -69,15 +84,15 @@ export default function ChatInput({ onSend, disabled }: ChatInputProps) {
     }
   }, [transcript]);
 
-  const handleMicClick = useCallback(() => {
-    if (isListening) {
-      stopListening();
+    const handleMicClick = useCallback(() => {
+    if (isRecording) {
+      stopRecording();
     } else {
       clearTranscript();
       setInput(""); // Clear current input
-      startListening();
+      startRecording();
     }
-  }, [isListening, startListening, stopListening, clearTranscript]);
+  }, [isRecording, startRecording, stopRecording, clearTranscript]);
 
   return (
         <div className="sticky bottom-0 left-0 right-0 z-10 p-2 sm:p-3 md:p-4 md:px-6 border-t border-[var(--border-color)] bg-[var(--bg-primary)]/95 backdrop-blur supports-[backdrop-filter]:bg-[var(--bg-primary)]/80 pb-[max(env(safe-area-inset-bottom),8px)]">
@@ -89,8 +104,8 @@ export default function ChatInput({ onSend, disabled }: ChatInputProps) {
   value={input}
   onChange={handleChange}
   onKeyDown={handleKeyDown}
-  placeholder={isListening ? "Listening... speak now" : "Ask about Dubai tours, Singapore activities, travel plans..."}
-  disabled={disabled || isListening}
+                              placeholder={isRecording ? "Listening... speak now" : "Ask about Dubai tours, Singapore activities, travel plans..."}
+              disabled={disabled || isRecording}
   rows={1}
   className="w-full resize-none bg-transparent p-0 pr-12 sm:pr-14 
              text-sm sm:text-base 
@@ -105,15 +120,15 @@ export default function ChatInput({ onSend, disabled }: ChatInputProps) {
                 type="button"
                 onClick={handleMicClick}
                 disabled={disabled}
-                className={`absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all ${
-                                    isListening
+                                                className={`absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all ${
+                  isRecording
                     ? 'bg-red-500 text-white animate-pulse shadow-lg shadow-red-500/30'
                     : 'bg-[var(--bg-card)] hover:bg-[var(--border-color)] text-[var(--text-secondary)] border border-[var(--border-color)]'
                 } disabled:opacity-40`}
-                aria-label={isListening ? "Stop listening" : "Start voice input"}
-                title={isListening ? "Stop listening" : "Click to speak"}
+                aria-label={isRecording ? "Stop listening" : "Start voice input"}
+                title={isRecording ? "Stop listening" : "Click to speak"}
               >
-                                <svg
+                                                                <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -165,9 +180,19 @@ export default function ChatInput({ onSend, disabled }: ChatInputProps) {
             Speech error: {speechError}
           </p>
         )}
-        {isListening && (
-          <p className="text-xs text-blue-500 text-center animate-pulse">
+                        {isRecording && (
+          <p className="text-xs text-red-500 text-center animate-pulse">
             🎤 Listening... Click the microphone again to stop
+          </p>
+        )}
+        {transcript && !isRecording && (
+          <p className="text-xs text-green-500 text-center">
+            ✅ Voice input ready - Click Send or press Enter
+          </p>
+        )}
+        {voiceEnabled && (isPlaying || isTTSLoading) && (
+          <p className="text-xs text-blue-500 text-center">
+            {isTTSLoading ? '🎵 Generating speech...' : '🔊 Playing response...'}
           </p>
         )}
                 {input.length > 900 && (
