@@ -9,6 +9,7 @@ import NewChatButton from "@/components/chat/NewChatButton";
 import QuickPrompts from "@/components/ui/QuickPrompts";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import VoiceStatus from "@/components/ui/VoiceStatus";
+import { useTheme } from "@/hooks/useTheme";
 
 interface ChatPanelProps {
   messages: Message[];
@@ -53,6 +54,7 @@ export default function ChatPanel({
   speechSupported = false,
 }: ChatPanelProps) {
   const [animatingIndex, setAnimatingIndex] = useState<number | null>(null);
+  const { theme } = useTheme();
 
   // When conversation switches (load from history / new chat), clear any leftover animation
   useEffect(() => {
@@ -87,8 +89,12 @@ export default function ChatPanel({
             </svg>
           </button>
 
-          <div className="w-20 sm:w-24 md:w-28 rounded-xl flex items-center justify-center flex-shrink-0">
-            <img src="/raynatourslogo.webp" alt="Rayna Tours Logo" className="w-full h-auto" />
+                    <div className="w-20 sm:w-24 md:w-28 rounded-xl flex items-center justify-center flex-shrink-0">
+            <img 
+              src={theme === 'dark' ? '/rayna_logo_dark.png' : '/raynatourslogo.webp'} 
+              alt="Rayna Tours Logo" 
+              className="w-full h-auto" 
+            />
           </div>
           <div className="min-w-0">
             <h2 className="text-xs sm:text-sm font-semibold text-[var(--text-primary)] truncate">

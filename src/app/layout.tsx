@@ -11,6 +11,17 @@ export const metadata: Metadata = {
   title: "Rayna Tours | AI Travel Assistant",
   description:
     "Discover tours, activities, and holiday packages with Rayna's AI travel assistant",
+  icons: {
+    icon: [
+      {
+        url: "/raynatourslogo.webp",
+        sizes: "32x32",
+        type: "image/webp",
+      },
+    ],
+    shortcut: "/raynatourslogo.webp",
+    apple: "/raynatourslogo.webp",
+  },
 };
 
 export default function RootLayout({
