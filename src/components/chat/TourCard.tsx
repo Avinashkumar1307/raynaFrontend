@@ -101,7 +101,7 @@ export default function TourCard({ card }: Props) {
           <div>
             {hasDiscount ? (
               <span className="text-[11px] text-[var(--text-tertiary)] line-through block mb-0.5">
-                {card.currency} {formatPrice(card.originalPrice)}
+                {card.currency} {formatPrice(card.originalPrice ?? 0)}
               </span>
             ) : null}
             <span className="text-lg font-extrabold text-[var(--text-primary)]">
