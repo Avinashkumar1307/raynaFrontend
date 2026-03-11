@@ -4,6 +4,7 @@ import MessageBubble from "./MessageBubble";
 import type { Message } from "@/lib/types";
 import { useScrollToBottom } from "@/hooks/useScrollToBottom";
 import TourCarousel from "./TourCarousel";
+import ProductCarousel from "./ProductCarousel";
 
 
 interface MessageListProps {
@@ -43,8 +44,12 @@ export default function MessageList({
               message={msg}
               animate={i === animatingIndex}
             />
-                        {msg.role === "assistant" && msg.tourCarousel ? (
-              <div className="ml-8 sm:ml-10 md:ml-11">{/* align with assistant avatar */}
+                        {msg.role === "assistant" && msg.productCarousel ? (
+              <div className="ml-8 sm:ml-10 md:ml-11">
+                <ProductCarousel carousel={msg.productCarousel} />
+              </div>
+            ) : msg.role === "assistant" && msg.tourCarousel ? (
+              <div className="ml-8 sm:ml-10 md:ml-11">
                 <TourCarousel carousel={msg.tourCarousel} />
               </div>
             ) : null}

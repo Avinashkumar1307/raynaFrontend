@@ -28,18 +28,50 @@ export interface TourCarousel {
   totalResults?: number;
 }
 
+export type ProductCardType = 'tour_carousel' | 'holiday_carousel' | 'cruise_carousel' | 'yacht_carousel';
+
+export interface ProductCard {
+  id: number | string;
+  title: string;
+  image: string;
+  location: string;
+  category: string;
+  originalPrice: number;
+  currentPrice: number;
+  currency: string;
+  duration?: string;
+  url: string;
+  slug?: string;
+  amenities?: string[];
+  rating?: number;
+  reviewCount?: number;
+  discount?: number;
+  discountPercentage?: number;
+  highlights?: string[];
+}
+
+export interface ProductCarousel {
+  type: ProductCardType;
+  title: string;
+  cards: ProductCard[];
+  totalResults?: number;
+}
+
 export interface Message {
   role: "user" | "assistant";
   content: string;
   tourCarousel?: TourCarousel;
+  productCarousel?: ProductCarousel;
 }
 
 export interface ChatResponse {
   message: string;
   session_id: string;
   tourCarousel?: TourCarousel;
+  productCarousel?: ProductCarousel;
   metadata?: {
     hasCards: boolean;
+    cardType?: ProductCardType;
     cardCount?: number;
     totalResults?: number;
   };

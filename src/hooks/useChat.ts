@@ -44,7 +44,7 @@ export function useChat() {
             setMessages(data.messages.map((m) => {
               if (m.role === "assistant") {
                 const { content, tourCarousel } = processAssistantContent(m.content, m.tourCarousel);
-                return { role: m.role, content, tourCarousel };
+                return { role: m.role, content, tourCarousel, productCarousel: m.productCarousel };
               }
               return { role: m.role as "user", content: m.content };
             }));
@@ -66,7 +66,7 @@ export function useChat() {
       setMessages(data.messages.map((m) => {
         if (m.role === "assistant") {
           const { content, tourCarousel } = processAssistantContent(m.content, m.tourCarousel);
-          return { role: m.role, content, tourCarousel };
+          return { role: m.role, content, tourCarousel, productCarousel: m.productCarousel };
         }
         return { role: m.role as "user", content: m.content };
       }));
@@ -96,9 +96,21 @@ export function useChat() {
       setSessionId(response.session_id);
       setCurrentSessionId(response.session_id);
 
+      // Extract product carousel (new unified format) or fall back to tour carousel
+      const productCarousel = response.productCarousel || undefined;
+
       // Process the response to extract or create tour carousel
       let tourCarousel = response.tourCarousel;
       let processedContent = response.message;
+
+      // Strip raw tags/JSON that the bot may have left in the message
+      processedContent = processedContent
+        .replace(/<CAROUSEL>[\s\S]*?<\/CAROUSEL>/gi, '')
+        .replace(/<holiday-cards>[\s\S]*?<\/holiday-cards>/gi, '')
+        .replace(/<cruise-cards>[\s\S]*?<\/cruise-cards>/gi, '')
+        .replace(/<yacht-cards>[\s\S]*?<\/yacht-cards>/gi, '')
+        .replace(/<product-carousel>[\s\S]*?<\/product-carousel>/gi, '')
+        .trim();
 
       // Enhanced tour detection - show carousel for both actual data AND tour questions
       const hasRealTourData = !tourCarousel && response.message && (
@@ -218,6 +230,7 @@ export function useChat() {
         role: "assistant",
         content: processedContent,
         tourCarousel: tourCarousel,
+        productCarousel: productCarousel,
       };
       setMessages((prev) => [...prev, assistantMsg]);
       setShouldScrollToBottom(true);
