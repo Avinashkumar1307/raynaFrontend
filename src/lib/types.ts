@@ -62,6 +62,7 @@ export interface Message {
   content: string;
   tourCarousel?: TourCarousel;
   productCarousel?: ProductCarousel;
+  suggestions?: string[];
 }
 
 export interface ChatResponse {

@@ -41,7 +41,7 @@ export interface StreamCallbacks {
   onToken?: (accumulated: string, delta: string) => void;
   onClearTokens?: () => void;
   onCarousel?: (data: { tourCarousel?: ChatResponse["tourCarousel"]; productCarousel?: ChatResponse["productCarousel"]; metadata?: ChatResponse["metadata"] }) => void;
-  onDone?: (sessionId: string, text: string, metadata?: ChatResponse["metadata"]) => void;
+  onDone?: (sessionId: string, text: string, metadata?: ChatResponse["metadata"], suggestions?: string[]) => void;
   onError?: (message: string) => void;
 }
 
@@ -109,7 +109,7 @@ export const api = {
                 onCarousel?.(data);
                 break;
               case "done":
-                onDone?.(data.session_id, accumulatedText, data.metadata);
+                onDone?.(data.session_id, accumulatedText, data.metadata, data.suggestions);
                 break;
               case "error":
                 onError?.(data.message);

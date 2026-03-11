@@ -25,7 +25,7 @@ export default function ChatInput({
   const {
     transcript,
     isListening,
-    isSupported: isSpeechSupported,
+    isSupported: isSpeechSupportedRaw,
     startListening,
     stopListening,
     clearTranscript,
@@ -35,6 +35,12 @@ export default function ChatInput({
     interimResults: true,
     language: 'en-US'
   });
+
+  // Defer speech support check to avoid hydration mismatch
+  const [isSpeechSupported, setIsSpeechSupported] = useState(false);
+  useEffect(() => {
+    setIsSpeechSupported(isSpeechSupportedRaw);
+  }, [isSpeechSupportedRaw]);
 
   const isRecording = isListening;
   const startRecording = startListening;

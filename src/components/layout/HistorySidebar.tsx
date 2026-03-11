@@ -136,19 +136,29 @@ export default function HistorySidebar({
     (c) => c.session_id === pendingDeleteId
   );
 
-  // Close on outside click (mobile only — desktop click-outside shouldn't close)
+  // Close on outside click (mobile only — desktop sidebar is always visible)
   useEffect(() => {
-    function handleOutside(e: MouseEvent) {
-      if (
-        isOpen &&
-        sidebarRef.current &&
-        !sidebarRef.current.contains(e.target as Node)
-      ) {
-        onClose();
+    if (!isOpen) return;
+
+    // Small delay so the opening click doesn't immediately close it
+    const timer = setTimeout(() => {
+      function handleOutside(e: MouseEvent) {
+        if (
+          sidebarRef.current &&
+          !sidebarRef.current.contains(e.target as Node)
+        ) {
+          onClose();
+        }
       }
-    }
-    document.addEventListener("mousedown", handleOutside);
-    return () => document.removeEventListener("mousedown", handleOutside);
+      document.addEventListener("mousedown", handleOutside);
+      cleanup = () => document.removeEventListener("mousedown", handleOutside);
+    }, 100);
+
+    let cleanup = () => {};
+    return () => {
+      clearTimeout(timer);
+      cleanup();
+    };
   }, [isOpen, onClose]);
 
   const handleDelete = (e: React.MouseEvent, sessionId: string) => {

@@ -219,7 +219,7 @@ export function useChat() {
             setShouldScrollToBottom(true);
           },
 
-          onDone(sid, finalText) {
+          onDone(sid, finalText, _metadata, suggestions) {
             // Cancel any pending throttled flush
             if (tokenFlushTimer.current) {
               clearTimeout(tokenFlushTimer.current);
@@ -236,7 +236,11 @@ export function useChat() {
               const idx = placeholderIndex.value;
               if (idx >= 0 && prev[idx]) {
                 const updated = [...prev];
-                updated[idx] = { ...updated[idx], content: finalContent };
+                updated[idx] = {
+                  ...updated[idx],
+                  content: finalContent,
+                  suggestions: suggestions || undefined,
+                };
                 return updated;
               }
               // No tokens/carousel were sent — add a final message
@@ -248,6 +252,7 @@ export function useChat() {
                     content: finalContent,
                     tourCarousel: streamingRef.current.tourCarousel,
                     productCarousel: streamingRef.current.productCarousel,
+                    suggestions: suggestions || undefined,
                   },
                 ];
               }

@@ -80,7 +80,7 @@ export default function ChatPanel({
         <div className="flex items-center gap-3">
           <button
             onClick={onOpenSidebar}
-            className="p-2 rounded-lg hover:bg-[var(--bg-card)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+            className="md:hidden p-2 rounded-lg hover:bg-[var(--bg-card)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
             aria-label="Open chat history"
             title="Chat history"
           >
@@ -167,6 +167,8 @@ export default function ChatPanel({
               animatingIndex={animatingIndex}
               shouldScrollToBottom={shouldScrollToBottom}
               onScrollTriggered={onScrollConsumed}
+              onSendMessage={onSendMessage}
+              isLoading={isLoading}
             />
             {isLoading && (
               <div className="px-4 sm:px-6 md:px-8 py-2">

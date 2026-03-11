@@ -31,17 +31,26 @@ export default function ContextSidebar({
 
   // Close on outside click (mobile only)
   useEffect(() => {
-    function handleOutside(e: MouseEvent) {
-      if (
-        isOpen &&
-        sidebarRef.current &&
-        !sidebarRef.current.contains(e.target as Node)
-      ) {
-        onClose();
+    if (!isOpen) return;
+
+    const timer = setTimeout(() => {
+      function handleOutside(e: MouseEvent) {
+        if (
+          sidebarRef.current &&
+          !sidebarRef.current.contains(e.target as Node)
+        ) {
+          onClose();
+        }
       }
-    }
-    document.addEventListener("mousedown", handleOutside);
-    return () => document.removeEventListener("mousedown", handleOutside);
+      document.addEventListener("mousedown", handleOutside);
+      cleanup = () => document.removeEventListener("mousedown", handleOutside);
+    }, 100);
+
+    let cleanup = () => {};
+    return () => {
+      clearTimeout(timer);
+      cleanup();
+    };
   }, [isOpen, onClose]);
 
   // Build the Google Maps embed query from user context
@@ -217,12 +226,16 @@ export default function ContextSidebar({
                       <img
                         src={dest.image}
                         alt={dest.name}
+                        crossOrigin="anonymous"
                         className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity"
                         onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = "none";
+                          const img = e.target as HTMLImageElement;
+                          img.style.display = "none";
+                          img.parentElement!.style.background =
+                            "linear-gradient(135deg, #1a365d 0%, #2d3748 100%)";
                         }}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-black/10" />
                       <div className="absolute bottom-2 left-2.5 flex items-center gap-1.5">
                         <span className="text-sm">{dest.emoji}</span>
                         <span className="text-xs font-semibold text-white">
