@@ -14,20 +14,6 @@ const categoryLabels: Record<CardType, string> = {
   yacht_carousel: "Yacht",
 };
 
-const categoryColors: Record<CardType, string> = {
-  tour_carousel: "from-blue-600 to-blue-700",
-  holiday_carousel: "from-emerald-600 to-emerald-700",
-  cruise_carousel: "from-cyan-600 to-cyan-700",
-  yacht_carousel: "from-violet-600 to-violet-700",
-};
-
-const buttonColors: Record<CardType, string> = {
-  tour_carousel: "from-gray-800 to-gray-900 group-hover:from-gray-700 group-hover:to-gray-800",
-  holiday_carousel: "from-emerald-600 to-emerald-700 group-hover:from-emerald-500 group-hover:to-emerald-600",
-  cruise_carousel: "from-cyan-600 to-cyan-700 group-hover:from-cyan-500 group-hover:to-cyan-600",
-  yacht_carousel: "from-violet-600 to-violet-700 group-hover:from-violet-500 group-hover:to-violet-600",
-};
-
 export default function ProductCard({ card, cardType }: Props) {
   const hasDiscount =
     card.originalPrice && card.currentPrice && card.originalPrice > card.currentPrice;
@@ -42,15 +28,15 @@ export default function ProductCard({ card, cardType }: Props) {
       href={bookingUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="group flex-shrink-0 w-64 sm:w-72 snap-center rounded-2xl overflow-hidden border border-[var(--border-color)] bg-[var(--bg-primary)] shadow-sm hover:shadow-lg hover:border-gray-400/30 transition-all focus:outline-none focus:ring-2 focus:ring-gray-400 transform hover:scale-[1.02]"
+      className="group flex-shrink-0 w-64 sm:w-72 snap-center rounded-2xl overflow-hidden bg-[var(--bg-card)] border border-[var(--border-color)] hover:border-[var(--text-tertiary)] shadow-sm hover:shadow-md transition-all duration-300"
     >
       {/* Image */}
-      <div className="relative h-36 sm:h-40 w-full bg-gray-100 overflow-hidden">
+      <div className="relative h-44 sm:h-48 w-full bg-[var(--bg-card)] overflow-hidden">
         {card.image ? (
           <img
             src={card.image}
             alt={card.title}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="h-full w-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.style.display = "none";
@@ -60,7 +46,7 @@ export default function ProductCard({ card, cardType }: Props) {
           />
         ) : null}
         <div
-          className="h-full w-full flex flex-col items-center justify-center text-xs text-[var(--text-secondary)] bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-700"
+          className="h-full w-full flex flex-col items-center justify-center text-xs text-[var(--text-secondary)] bg-[var(--bg-card)]"
           style={{ display: card.image ? "none" : "flex" }}
         >
           <svg
@@ -69,7 +55,7 @@ export default function ProductCard({ card, cardType }: Props) {
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="w-8 h-8 mb-2 text-gray-600"
+            className="w-8 h-8 mb-2 text-[var(--text-tertiary)]"
           >
             <path
               strokeLinecap="round"
@@ -81,68 +67,75 @@ export default function ProductCard({ card, cardType }: Props) {
           <span className="text-center px-2">{card.location}</span>
         </div>
 
+        {/* Gradient overlay at bottom for text readability */}
+        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
+
         {/* Category badge */}
-        <div
-          className={`absolute top-2 right-2 text-white text-[10px] font-semibold px-2 py-0.5 rounded-md bg-gradient-to-r ${categoryColors[cardType]}`}
-        >
+        <div className="absolute top-3 right-3 text-white text-[10px] font-semibold px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-sm">
           {categoryLabels[cardType]}
         </div>
 
         {/* Discount badge */}
         {discountPct > 0 ? (
-          <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-md">
+          <div className="absolute top-3 left-3 bg-red-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm">
             -{discountPct}%
           </div>
         ) : null}
+
+        {/* Location on image */}
+        <div className="absolute bottom-2.5 left-3 flex items-center gap-1 text-white/90 text-xs">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3 h-3">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+          </svg>
+          <span className="truncate max-w-[180px] font-medium drop-shadow-sm">{card.location}</span>
+        </div>
       </div>
 
       {/* Content */}
-      <div className="p-3 sm:p-3.5 space-y-1.5 sm:space-y-2">
-        <h3 className="text-xs sm:text-sm font-semibold text-[var(--text-primary)] line-clamp-2 min-h-[2rem] sm:min-h-[2.5rem]">
+      <div className="p-4 space-y-2.5">
+        <h3 className="text-sm font-semibold text-[var(--text-primary)] line-clamp-2 leading-snug">
           {card.title}
         </h3>
 
-        <div className="flex items-center justify-between">
-          <div className="text-xs text-[var(--text-secondary)] truncate max-w-[65%]">
-            {card.location}
-          </div>
-          {card.duration ? (
-            <div className="text-xs font-medium text-[var(--text-secondary)]">
+        <div className="flex items-center gap-3 text-xs text-[var(--text-secondary)]">
+          {card.duration && (
+            <span className="flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3 h-3">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+              </svg>
               {card.duration}
-            </div>
+            </span>
+          )}
+          {typeof card.rating === "number" ? (
+            <span className="flex items-center gap-1">
+              <span className="text-amber-500">★</span>
+              {card.rating.toFixed(1)}
+              {card.reviewCount ? <span className="text-[var(--text-tertiary)]">({card.reviewCount})</span> : null}
+            </span>
           ) : null}
         </div>
 
-        {typeof card.rating === "number" ? (
-          <div className="text-xs font-medium text-gray-700 dark:text-gray-400">
-            ★ {card.rating.toFixed(1)}
-            {card.reviewCount ? (
-              <span className="text-[var(--text-secondary)] font-normal ml-1">
-                ({card.reviewCount})
-              </span>
-            ) : null}
-          </div>
-        ) : null}
-
         {/* Price */}
-        <div className="flex items-baseline gap-2">
-          <div className="text-sm sm:text-base font-bold text-[var(--text-primary)]">
+        <div className="flex items-baseline gap-2 pt-1 border-t border-[var(--border-color)]">
+          <span className="text-base font-bold text-[var(--text-primary)]">
             {card.currency} {card.currentPrice}
-          </div>
+          </span>
           {hasDiscount ? (
-            <div className="text-xs text-[var(--text-secondary)] line-through opacity-60">
+            <span className="text-xs text-[var(--text-tertiary)] line-through">
               {card.currency} {card.originalPrice}
-            </div>
+            </span>
           ) : null}
+          <span className="ml-auto text-[10px] text-[var(--text-tertiary)]">per person</span>
         </div>
 
         {/* Amenities (holidays) */}
         {card.amenities && card.amenities.length > 0 ? (
-          <div className="flex flex-wrap gap-1 mt-1">
-            {card.amenities.map((a) => (
+          <div className="flex flex-wrap gap-1.5">
+            {card.amenities.slice(0, 4).map((a) => (
               <span
                 key={a}
-                className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800/40"
+                className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--bg-card-hover)] text-[var(--text-secondary)] font-medium"
               >
                 {a}
               </span>
@@ -152,26 +145,17 @@ export default function ProductCard({ card, cardType }: Props) {
 
         {/* Highlights (tours) */}
         {!card.amenities?.length && card.highlights && card.highlights.length > 0 ? (
-          <div className="flex flex-wrap gap-1.5 mt-1">
+          <div className="flex flex-wrap gap-1.5">
             {card.highlights.slice(0, 3).map((h) => (
               <span
                 key={h}
-                className="text-[10px] px-2 py-0.5 rounded-full bg-gray-50 dark:bg-gray-900/30 text-gray-700 dark:text-gray-400 border border-gray-100 dark:border-gray-800"
+                className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--bg-card-hover)] text-[var(--text-secondary)] font-medium"
               >
                 {h}
               </span>
             ))}
           </div>
         ) : null}
-
-        {/* CTA */}
-        <div className="mt-3">
-          <span
-            className={`inline-flex items-center justify-center w-full text-xs font-semibold text-white bg-gradient-to-r ${buttonColors[cardType]} rounded-lg py-2`}
-          >
-            {cardType === "tour_carousel" ? "View Details" : "Book Now"}
-          </span>
-        </div>
       </div>
     </a>
   );

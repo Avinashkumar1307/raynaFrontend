@@ -150,3 +150,8 @@ export interface HealthResponse {
   timestamp: string;
 }
 
+export interface ContextDestination {
+  name: string;
+  detectedFrom: string;
+}
+

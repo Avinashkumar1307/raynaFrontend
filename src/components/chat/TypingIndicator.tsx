@@ -1,21 +1,44 @@
-export default function TypingIndicator() {
+"use client";
+
+import { useState, useEffect } from "react";
+
+const fallbackMessages = [
+  "Just a sec...",
+  "Thinking...",
+  "Looking into it...",
+  "Finding the best options...",
+  "Almost there...",
+];
+
+interface TypingIndicatorProps {
+  status?: string | null;
+}
+
+export default function TypingIndicator({ status }: TypingIndicatorProps) {
+  const [fallbackIndex, setFallbackIndex] = useState(0);
+
+  // Only cycle through fallback messages when no real status is provided
+  useEffect(() => {
+    if (status) return;
+    const interval = setInterval(() => {
+      setFallbackIndex((prev) => (prev + 1) % fallbackMessages.length);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, [status]);
+
+  const displayText = status || fallbackMessages[fallbackIndex];
+  const key = status || `fallback-${fallbackIndex}`;
+
   return (
-        <div className="flex justify-start message-enter">
-              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center text-white text-xs font-bold mr-2 sm:mr-3 shrink-0 shadow-lg shadow-gray-500/20">
-        R
-      </div>
-      <div className="glass rounded-2xl rounded-bl-sm px-3 sm:px-4 md:px-5 py-2.5 sm:py-3 md:py-3.5 flex items-center gap-2">
-                <span
-                      className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-600 rounded-full pulse-dot"
-        />
-        <span
-                      className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-600 rounded-full pulse-dot"
-          style={{ animationDelay: "0.2s" }}
-        />
-        <span
-                      className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-600 rounded-full pulse-dot"
-          style={{ animationDelay: "0.4s" }}
-        />
+    <div className="flex justify-start message-enter">
+      <div className="flex items-center gap-2 py-2">
+        <div className="w-4 h-4 relative flex items-center justify-center">
+          <div className="w-2 h-2 bg-[var(--accent)] rounded-full animate-ping opacity-40 absolute" />
+          <div className="w-2 h-2 bg-[var(--accent)] rounded-full relative" />
+        </div>
+        <span className="text-sm text-[var(--text-secondary)] animate-fade-in" key={key}>
+          {displayText}
+        </span>
       </div>
     </div>
   );

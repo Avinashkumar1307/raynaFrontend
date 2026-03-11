@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import type { TourCard as TourCardType } from "@/lib/types";
 
 interface Props {
@@ -8,95 +7,107 @@ interface Props {
 }
 
 export default function TourCard({ card }: Props) {
-  const handleClick = (e: React.MouseEvent) => {
-    // Track click analytics if needed
-    console.log('Tour card clicked:', card.title);
-  };
-
   return (
     <a
       href={card.url}
       target="_blank"
       rel="noopener noreferrer"
-      onClick={handleClick}
-              className="group flex-shrink-0 w-64 sm:w-72 snap-center rounded-2xl overflow-hidden border border-[var(--border-color)] bg-[var(--bg-primary)] shadow-sm hover:shadow-lg hover:border-gray-400/30 transition-all focus:outline-none focus:ring-2 focus:ring-gray-400 transform hover:scale-[1.02]"
+      className="group flex-shrink-0 w-64 sm:w-72 snap-center rounded-2xl overflow-hidden bg-[var(--bg-card)] border border-[var(--border-color)] hover:border-[var(--text-tertiary)] shadow-sm hover:shadow-md transition-all duration-300"
     >
-              <div className="relative h-36 sm:h-40 w-full bg-gray-100 overflow-hidden">
+      {/* Image */}
+      <div className="relative h-44 sm:h-48 w-full bg-[var(--bg-card)] overflow-hidden">
         {card.image ? (
           <img
             src={card.image}
             alt={card.title}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="h-full w-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
+              target.style.display = "none";
               const placeholder = target.nextElementSibling as HTMLElement;
-              if (placeholder) placeholder.style.display = 'flex';
+              if (placeholder) placeholder.style.display = "flex";
             }}
           />
         ) : null}
-        <div 
-          className="h-full w-full flex flex-col items-center justify-center text-xs text-[var(--text-secondary)] bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-700"
-          style={{ display: card.image ? 'none' : 'flex' }}
+        <div
+          className="h-full w-full flex flex-col items-center justify-center text-xs text-[var(--text-secondary)] bg-[var(--bg-card)]"
+          style={{ display: card.image ? "none" : "flex" }}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 mb-2 text-gray-600">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 mb-2 text-[var(--text-tertiary)]">
             <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
           </svg>
-          <span className="font-medium">{card.category || 'Tour'}</span>
+          <span className="font-medium">{card.category || "Tour"}</span>
           <span className="text-center px-2">{card.location}</span>
         </div>
+
+        {/* Gradient overlay */}
+        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
+
+        {/* Discount badge */}
         {card.discountPercentage ? (
-          <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-md">
+          <div className="absolute top-3 left-3 bg-red-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm">
             -{card.discountPercentage}%
           </div>
         ) : null}
+
+        {/* New badge */}
         {card.isNew ? (
-          <div className="absolute top-2 right-2 bg-emerald-500 text-white text-xs font-semibold px-2 py-1 rounded-md">
+          <div className="absolute top-3 right-3 text-white text-[10px] font-semibold px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-sm">
             New
           </div>
         ) : null}
+
+        {/* Location on image */}
+        <div className="absolute bottom-2.5 left-3 flex items-center gap-1 text-white/90 text-xs">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3 h-3">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+          </svg>
+          <span className="truncate max-w-[180px] font-medium drop-shadow-sm">{card.location}</span>
+        </div>
       </div>
 
-      <div className="p-3 sm:p-3.5 space-y-1.5 sm:space-y-2">
-        <h3 className="text-xs sm:text-sm font-semibold text-[var(--text-primary)] line-clamp-2 min-h-[2rem] sm:min-h-[2.5rem]">
+      {/* Content */}
+      <div className="p-4 space-y-2.5">
+        <h3 className="text-sm font-semibold text-[var(--text-primary)] line-clamp-2 leading-snug">
           {card.title}
         </h3>
-        <div className="flex items-center justify-between">
-          <div className="text-xs text-[var(--text-secondary)] truncate max-w-[65%]">{card.location}</div>
+
+        <div className="flex items-center gap-3 text-xs text-[var(--text-secondary)]">
           {typeof card.rating === "number" ? (
-            <div className="text-xs font-medium text-gray-700">★ {card.rating.toFixed(1)}</div>
+            <span className="flex items-center gap-1">
+              <span className="text-amber-500">★</span>
+              {card.rating.toFixed(1)}
+            </span>
           ) : null}
         </div>
 
-        <div className="flex items-baseline gap-2">
-          <div className="text-sm sm:text-base font-bold text-[var(--text-primary)]">
+        {/* Price */}
+        <div className="flex items-baseline gap-2 pt-1 border-t border-[var(--border-color)]">
+          <span className="text-base font-bold text-[var(--text-primary)]">
             {card.currency} {card.currentPrice}
-          </div>
+          </span>
           {card.originalPrice ? (
-            <div className="text-xs text-[var(--text-secondary)] line-through opacity-60">
+            <span className="text-xs text-[var(--text-tertiary)] line-through">
               {card.currency} {card.originalPrice}
-            </div>
+            </span>
           ) : null}
+          <span className="ml-auto text-[10px] text-[var(--text-tertiary)]">per person</span>
         </div>
 
+        {/* Highlights */}
         {card.highlights && card.highlights.length > 0 ? (
-          <div className="flex flex-wrap gap-1.5 mt-1">
+          <div className="flex flex-wrap gap-1.5">
             {card.highlights.slice(0, 3).map((h) => (
               <span
                 key={h}
-                className="text-[10px] px-2 py-0.5 rounded-full bg-gray-50 dark:bg-gray-900/30 text-gray-700 dark:text-gray-400 border border-gray-100 dark:border-gray-800"
+                className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--bg-card-hover)] text-[var(--text-secondary)] font-medium"
               >
                 {h}
               </span>
             ))}
           </div>
         ) : null}
-
-        <div className="mt-3">
-                      <span className="inline-flex items-center justify-center w-full text-xs font-semibold text-white bg-gradient-to-r from-gray-800 to-gray-900 rounded-lg py-2 group-hover:from-gray-700 group-hover:to-gray-800">
-            View details
-          </span>
-        </div>
       </div>
     </a>
   );

@@ -47,7 +47,7 @@ function ConversationItem({
       onClick={onSelect}
       className={`group relative flex items-start gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-150 ${
         isActive
-          ? "glass border border-[var(--border-color)] text-[var(--text-primary)]"
+          ? "bg-[var(--bg-card)] text-[var(--text-primary)]"
           : "hover:bg-[var(--bg-card)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
       }`}
     >
@@ -255,17 +255,9 @@ export default function HistorySidebar({
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-4 border-b border-[var(--border-color)]">
           <div className="flex items-center gap-2.5">
-            <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-gray-800 to-gray-900 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center text-white text-[10px] font-bold shadow-sm">
-              R
-            </div>
-            <div>
-              <p className="text-xs font-bold text-[var(--text-primary)] tracking-tight leading-none">
-                Rayna Tours
-              </p>
-              <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">
-                Chat History
-              </p>
-            </div>
+            <p className="text-xs font-bold text-[var(--text-primary)] tracking-tight">
+              Chat History
+            </p>
           </div>
           {/* Close button — mobile only */}
           <button
@@ -290,7 +282,7 @@ export default function HistorySidebar({
         <div className="px-3 pt-3 pb-2">
           <button
             onClick={onNewChat}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-xl border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)] transition-all text-xs font-medium glass-hover"
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-xl border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)] transition-all text-xs font-medium"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

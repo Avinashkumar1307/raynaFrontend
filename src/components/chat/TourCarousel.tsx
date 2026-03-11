@@ -19,39 +19,37 @@ export default function TourCarousel({ carousel }: Props) {
 
   if (!carousel?.cards || carousel.cards.length === 0) {
     return (
-      <div className="mt-2 sm:mt-3 p-4 text-center text-[var(--text-secondary)] bg-[var(--bg-card)] rounded-xl border border-[var(--border-color)]">
-        <div className="text-2xl mb-2">🎠</div>
+      <div className="mt-3 p-4 text-center text-[var(--text-secondary)] bg-[var(--bg-card)] rounded-xl border border-[var(--border-color)]">
         <p className="text-sm">No tours available at the moment.</p>
-        <p className="text-xs mt-1">Please try a different search or visit our website.</p>
+        <p className="text-xs mt-1 text-[var(--text-tertiary)]">Please try a different search or visit our website.</p>
       </div>
     );
   }
 
   return (
-    <div className="mt-2 sm:mt-3">
-      <div className="flex items-baseline justify-between mb-2 px-1">
-        <div className="min-w-0 flex-1 mr-2">
-          <div className="flex items-center gap-2">
-            <span className="text-lg">🎠</span>
-            <div className="text-xs sm:text-sm font-bold text-[var(--text-primary)] truncate">{carousel.title}</div>
-          </div>
+    <div className="mt-3 sm:mt-4">
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <h3 className="text-sm font-semibold text-[var(--text-primary)]">
+            {carousel.title}
+          </h3>
           {carousel.subtitle ? (
-            <div className="text-xs text-[var(--text-secondary)] truncate ml-7">{carousel.subtitle}</div>
+            <p className="text-xs text-[var(--text-tertiary)] mt-0.5">{carousel.subtitle}</p>
           ) : null}
         </div>
-        <div className="flex gap-1 sm:gap-1.5 flex-shrink-0">
+        <div className="flex gap-1.5">
           <button
             type="button"
-            onClick={() => scrollBy(-280)}
-            className="h-7 w-7 sm:h-8 sm:w-8 rounded-md border border-[var(--border-color)] bg-[var(--bg-primary)] text-[var(--text-primary)] text-sm hover:bg-[var(--bg-card)] flex items-center justify-center transition-colors"
+            onClick={() => scrollBy(-300)}
+            className="h-8 w-8 rounded-full border border-[var(--border-color)] bg-[var(--bg-primary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)] flex items-center justify-center transition-colors text-sm"
             aria-label="Scroll left"
           >
             ‹
           </button>
           <button
             type="button"
-            onClick={() => scrollBy(280)}
-            className="h-7 w-7 sm:h-8 sm:w-8 rounded-md border border-[var(--border-color)] bg-[var(--bg-primary)] text-[var(--text-primary)] text-sm hover:bg-[var(--bg-card)] flex items-center justify-center transition-colors"
+            onClick={() => scrollBy(300)}
+            className="h-8 w-8 rounded-full border border-[var(--border-color)] bg-[var(--bg-primary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)] flex items-center justify-center transition-colors text-sm"
             aria-label="Scroll right"
           >
             ›
@@ -61,10 +59,12 @@ export default function TourCarousel({ carousel }: Props) {
 
       <div
         ref={scrollRef}
-        className="flex gap-2 sm:gap-3 overflow-x-auto snap-x snap-mandatory px-1 py-1 scrollbar-thin -mx-1"
+        className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-thin pb-3"
       >
-        {carousel.cards.map((card) => (
-          <TourCard key={card.id} card={card} />
+        {carousel.cards.map((card, i) => (
+          <div key={card.id} className="animate-card-in" style={{ animationDelay: `${i * 80}ms` }}>
+            <TourCard card={card} />
+          </div>
         ))}
       </div>
     </div>
