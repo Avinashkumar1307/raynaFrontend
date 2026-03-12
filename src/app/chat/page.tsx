@@ -58,7 +58,7 @@ function ChatContent() {
     deleteConversation,
   } = useHistory();
 
-  const { currentDestination, searchQuery } =
+  const { currentDestination, currentLandmark, searchQuery } =
     useDestinationContext(messages);
 
   // Auto-send from URL params (?destination=Dubai or ?q=query)
@@ -156,6 +156,7 @@ function ChatContent() {
 
       <ContextSidebar
         destination={currentDestination?.name || null}
+        landmark={currentLandmark}
         searchQuery={searchQuery}
         isOpen={rightSidebarOpen}
         onClose={() => setRightSidebarOpen(false)}

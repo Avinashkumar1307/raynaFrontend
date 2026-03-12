@@ -1,9 +1,29 @@
 "use client";
 
 import { useTheme } from "@/hooks/useTheme";
+import { useEffect, useState } from "react";
 
 export default function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Before mount, render a neutral icon so server HTML matches client initial render
+  if (!mounted) {
+    return (
+      <button
+        className="flex items-center justify-center w-9 h-9 rounded-lg hover:bg-[var(--bg-card)] transition-all text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+        aria-label="Toggle theme"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 sm:w-5 sm:h-5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+        </svg>
+      </button>
+    );
+  }
 
   return (
     <button

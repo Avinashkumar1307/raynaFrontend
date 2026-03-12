@@ -97,6 +97,7 @@ export default function ChatPanel({
               src={theme === 'dark' ? '/rayna_logo_dark.png' : '/raynatourslogo.webp'}
               alt="Rayna Tours"
               className="w-full h-auto"
+              suppressHydrationWarning
             />
           </div>
         </div>

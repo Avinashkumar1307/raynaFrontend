@@ -156,6 +156,14 @@ export interface ContextDestination {
   detectedFrom: string;
 }
 
+export interface ContextLandmark {
+  name: string;
+  city: string;
+  mapQuery: string;
+  emoji: string;
+  nearbyLabel: string;
+}
+
 export interface CartItem {
   id: string;
   title: string;
