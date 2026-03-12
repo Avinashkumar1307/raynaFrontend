@@ -8,10 +8,13 @@ import { useDestinationContext } from "@/hooks/useDestinationContext";
 import ChatPanel from "@/components/layout/ChatPanel";
 import HistorySidebar from "@/components/layout/HistorySidebar";
 import ContextSidebar from "@/components/layout/ContextSidebar";
+import CartDrawer from "@/components/layout/CartDrawer";
+import { CartProvider } from "@/context/CartContext";
 
 function ChatContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [rightSidebarOpen, setRightSidebarOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
   const searchParams = useSearchParams();
   const hasAutoSent = useRef(false);
@@ -110,6 +113,7 @@ function ChatContent() {
 
   return (
     <main className="flex h-screen bg-[var(--bg-primary)] overflow-hidden transition-colors duration-300">
+      <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
       <HistorySidebar
         conversations={conversations}
         currentSessionId={currentSessionId}
@@ -138,6 +142,7 @@ function ChatContent() {
           onAnimationConsumed={consumeAnimationTrigger}
           onOpenSidebar={() => setSidebarOpen(true)}
           onOpenContextSidebar={() => setRightSidebarOpen(true)}
+          onOpenCart={() => setCartOpen(true)}
           voiceEnabled={voiceEnabled}
           onToggleVoice={toggleVoice}
           isPlaying={isPlaying}
@@ -162,14 +167,16 @@ function ChatContent() {
 
 export default function ChatPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="flex h-screen items-center justify-center bg-[var(--bg-primary)]">
-          <div className="animate-spin rounded-full h-8 w-8 border-2 border-[var(--text-tertiary)] border-t-[var(--text-primary)]" />
-        </div>
-      }
-    >
-      <ChatContent />
-    </Suspense>
+    <CartProvider>
+      <Suspense
+        fallback={
+          <div className="flex h-screen items-center justify-center bg-[var(--bg-primary)]">
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-[var(--text-tertiary)] border-t-[var(--text-primary)]" />
+          </div>
+        }
+      >
+        <ChatContent />
+      </Suspense>
+    </CartProvider>
   );
 }

@@ -156,3 +156,17 @@ export interface ContextDestination {
   detectedFrom: string;
 }
 
+export interface CartItem {
+  id: string;
+  title: string;
+  image: string;
+  location: string;
+  category: string;
+  price: number;
+  originalPrice?: number;
+  currency: string;
+  url: string;
+  duration?: string;
+  type: 'tour' | 'holiday' | 'cruise' | 'yacht';
+}
+

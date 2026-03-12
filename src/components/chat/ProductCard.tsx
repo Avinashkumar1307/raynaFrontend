@@ -4,6 +4,7 @@ import type {
   ProductCard as ProductCardType,
   ProductCardType as CardType,
 } from "@/lib/types";
+import { useCart } from "@/context/CartContext";
 
 interface Props {
   card: ProductCardType;
@@ -17,6 +18,13 @@ const categoryLabels: Record<CardType, string> = {
   yacht_carousel: "Yacht",
 };
 
+const cartTypeMap: Record<CardType, "tour" | "holiday" | "cruise" | "yacht"> = {
+  tour_carousel: "tour",
+  holiday_carousel: "holiday",
+  cruise_carousel: "cruise",
+  yacht_carousel: "yacht",
+};
+
 function formatPrice(price: number): string {
   if (price >= 1000) {
     return price.toLocaleString();
@@ -25,6 +33,9 @@ function formatPrice(price: number): string {
 }
 
 export default function ProductCard({ card, cardType }: Props) {
+  const { addItem, removeItem, isInCart } = useCart();
+  const inCart = isInCart(String(card.id));
+
   const label = categoryLabels[cardType] || "Tour";
   const hasDiscount =
     card.originalPrice &&
@@ -37,15 +48,31 @@ export default function ProductCard({ card, cardType }: Props) {
     : 0;
   const bookingUrl = card.url || "https://www.raynatours.com";
 
+  function handleCartClick(e: React.MouseEvent) {
+    e.preventDefault();
+    if (inCart) {
+      removeItem(String(card.id));
+    } else {
+      addItem({
+        id: String(card.id),
+        title: card.title,
+        image: card.image,
+        location: card.location,
+        category: card.category,
+        price: card.currentPrice,
+        originalPrice: card.originalPrice,
+        currency: card.currency,
+        url: bookingUrl,
+        duration: card.duration,
+        type: cartTypeMap[cardType] ?? "tour",
+      });
+    }
+  }
+
   return (
-    <a
-      href={bookingUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group flex-shrink-0 w-[400px] snap-center rounded-2xl overflow-hidden bg-[var(--bg-card)] border border-[var(--border-color)] hover:border-[var(--text-tertiary)] shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5"
-    >
+    <div className="group flex-shrink-0 w-[240px] sm:w-[280px] snap-center rounded-2xl overflow-hidden bg-[var(--bg-card)] border border-[var(--border-color)] hover:border-[var(--text-tertiary)] shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
       {/* Image */}
-      <div className="relative h-40 w-full bg-[var(--bg-card)] overflow-hidden">
+      <div className="relative h-32 sm:h-36 w-full bg-[var(--bg-card)] overflow-hidden">
         {card.image ? (
           <img
             src={card.image}
@@ -106,8 +133,8 @@ export default function ProductCard({ card, cardType }: Props) {
       </div>
 
       {/* Content */}
-      <div className="p-4 space-y-2.5">
-        <h3 className="text-[13px] font-bold text-[var(--text-primary)] line-clamp-2 leading-tight min-h-[36px]">
+      <div className="p-3 space-y-2">
+        <h3 className="text-[12px] font-bold text-[var(--text-primary)] line-clamp-2 leading-tight min-h-[32px]">
           {card.title}
         </h3>
 
@@ -135,7 +162,7 @@ export default function ProductCard({ card, cardType }: Props) {
                 {card.currency} {formatPrice(card.originalPrice)}
               </span>
             ) : null}
-            <span className="text-lg font-extrabold text-[var(--text-primary)]">
+            <span className="text-base font-extrabold text-[var(--text-primary)]">
               {card.currency} {formatPrice(card.currentPrice)}
             </span>
           </div>
@@ -175,7 +202,43 @@ export default function ProductCard({ card, cardType }: Props) {
             ))}
           </div>
         ) : null}
+
+        {/* Action buttons */}
+        <div className="flex gap-2 pt-1">
+          <button
+            onClick={handleCartClick}
+            className={`flex-1 flex items-center justify-center gap-1.5 text-[12px] font-semibold py-2 px-3 rounded-xl border transition-all duration-200 ${
+              inCart
+                ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-red-500/10 hover:border-red-400/30 hover:text-red-500"
+                : "bg-[var(--bg-card-hover)] border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--accent)]/10 hover:border-[var(--accent)]/40 hover:text-[var(--accent)]"
+            }`}
+          >
+            {inCart ? (
+              <>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                </svg>
+                Added
+              </>
+            ) : (
+              <>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                </svg>
+                Add to Cart
+              </>
+            )}
+          </button>
+          <a
+            href={bookingUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 flex items-center justify-center gap-1.5 text-[12px] font-semibold py-2 px-3 rounded-xl bg-[var(--accent)] text-white hover:opacity-90 transition-opacity"
+          >
+            Book Now
+          </a>
+        </div>
       </div>
-    </a>
+    </div>
   );
 }
