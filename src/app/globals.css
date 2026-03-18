@@ -13,11 +13,19 @@
   --text-primary: #111827;
   --text-secondary: #6b7280;
   --text-tertiary: #9ca3af;
-  --accent: oklch(0.97 0 0);
+  --brand-accent: #111827;
   --accent-light: #374151;
   --input-bg: #f3f4f6;
   --user-msg-bg: #111827;
   --user-msg-text: #ffffff;
+  --accent-green: #22c55e;
+  --accent-green-hover: #16a34a;
+  --icon-strip-bg: #f1f5f9;
+  --icon-strip-active: #e2e8f0;
+  --filter-chip-bg: #f1f5f9;
+  --filter-chip-active-bg: #111827;
+  --filter-chip-active-text: #ffffff;
+  --record-btn: #ef4444;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -60,11 +68,19 @@
   --text-primary: #f0f0f5;
   --text-secondary: #8a8a9a;
   --text-tertiary: #5a5a6a;
-  --accent: oklch(0.269 0 0);
+  --brand-accent: #f0f0f5;
   --accent-light: #a0a0b0;
   --input-bg: #1a1a24;
   --user-msg-bg: #2a2a3a;
   --user-msg-text: #f0f0f5;
+  --accent-green: #22c55e;
+  --accent-green-hover: #16a34a;
+  --icon-strip-bg: #1a1a24;
+  --icon-strip-active: #242430;
+  --filter-chip-bg: #1a1a24;
+  --filter-chip-active-bg: #f0f0f5;
+  --filter-chip-active-text: #0a0a0f;
+  --record-btn: #ef4444;
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -159,7 +175,7 @@ body {
 .cursor-blink::after {
   content: "|";
   animation: blink 0.8s step-end infinite;
-  color: var(--accent);
+  color: var(--brand-accent);
   font-weight: 300;
   margin-left: 1px;
 }
@@ -309,6 +325,90 @@ body {
   input[type="color"] {
     font-size: 16px;
   }
+}
+
+/* Shimmer loading effect */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent 25%, rgba(255,255,255,0.08) 50%, transparent 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+/* Staggered entrance for children */
+@keyframes staggerIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stagger-in > * {
+  opacity: 0;
+  animation: staggerIn 0.4s ease-out forwards;
+}
+
+.stagger-in > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-in > *:nth-child(2) { animation-delay: 60ms; }
+.stagger-in > *:nth-child(3) { animation-delay: 120ms; }
+.stagger-in > *:nth-child(4) { animation-delay: 180ms; }
+.stagger-in > *:nth-child(5) { animation-delay: 240ms; }
+.stagger-in > *:nth-child(6) { animation-delay: 300ms; }
+
+/* Glow effect for input focus */
+.glow-border {
+  transition: box-shadow 0.3s ease;
+}
+.glow-border:focus-within {
+  box-shadow: 0 0 0 2px var(--brand-accent), 0 0 20px -5px var(--brand-accent);
+}
+
+/* Typing dots animation */
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-4px); }
+}
+
+.typing-dot {
+  animation: typingBounce 1.4s ease-in-out infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glass morphism */
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+:root .glass {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+/* Smooth scale on hover */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
 @theme inline {
