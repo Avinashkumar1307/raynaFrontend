@@ -43,3 +43,68 @@ export const SUPPORTED_DESTINATIONS = [
 export const DESTINATION_NAMES = SUPPORTED_DESTINATIONS.map((d) => d.name.toLowerCase());
 
 export const FEATURED_DESTINATIONS = SUPPORTED_DESTINATIONS.slice(0, 6);
+
+// Specific landmarks/attractions — used for precise map pinning
+export interface Landmark {
+  name: string;
+  city: string;          // parent destination for fallback
+  mapQuery: string;      // exact query sent to map embed (city-qualified)
+  emoji: string;
+  nearbyLabel: string;   // label for "nearby" quick action
+}
+
+export const LANDMARKS: Landmark[] = [
+  // Dubai
+  { name: "Burj Khalifa", city: "Dubai", mapQuery: "Burj Khalifa, Dubai, UAE", emoji: "🏙️", nearbyLabel: "Viewpoints near Burj Khalifa" },
+  { name: "Burj Al Arab", city: "Dubai", mapQuery: "Burj Al Arab, Dubai, UAE", emoji: "⛵", nearbyLabel: "Beach resorts near Burj Al Arab" },
+  { name: "Palm Jumeirah", city: "Dubai", mapQuery: "Palm Jumeirah, Dubai, UAE", emoji: "🌴", nearbyLabel: "Attractions on Palm Jumeirah" },
+  { name: "Dubai Mall", city: "Dubai", mapQuery: "Dubai Mall, Dubai, UAE", emoji: "🛍️", nearbyLabel: "Activities near Dubai Mall" },
+  { name: "Dubai Frame", city: "Dubai", mapQuery: "Dubai Frame, UAE", emoji: "🖼️", nearbyLabel: "Sights near Dubai Frame" },
+  { name: "Dubai Creek", city: "Dubai", mapQuery: "Dubai Creek, Dubai, UAE", emoji: "🚤", nearbyLabel: "Experiences at Dubai Creek" },
+  { name: "Dubai Marina", city: "Dubai", mapQuery: "Dubai Marina, UAE", emoji: "⛵", nearbyLabel: "Activities in Dubai Marina" },
+  { name: "Gold Souk", city: "Dubai", mapQuery: "Gold Souk, Deira, Dubai", emoji: "💛", nearbyLabel: "Souks near Gold Souk Dubai" },
+  { name: "Spice Souk", city: "Dubai", mapQuery: "Spice Souk, Deira, Dubai", emoji: "🌶️", nearbyLabel: "Markets near Spice Souk" },
+  { name: "Global Village", city: "Dubai", mapQuery: "Global Village Dubai, UAE", emoji: "🌍", nearbyLabel: "Events near Global Village" },
+  { name: "Dubai Miracle Garden", city: "Dubai", mapQuery: "Dubai Miracle Garden, UAE", emoji: "🌸", nearbyLabel: "Parks near Miracle Garden" },
+  { name: "Atlantis", city: "Dubai", mapQuery: "Atlantis The Palm, Dubai, UAE", emoji: "🌊", nearbyLabel: "Water parks near Atlantis Dubai" },
+  { name: "Dubai Aquarium", city: "Dubai", mapQuery: "Dubai Aquarium and Underwater Zoo", emoji: "🐠", nearbyLabel: "Family attractions near Dubai Aquarium" },
+  { name: "Desert Safari", city: "Dubai", mapQuery: "Dubai Desert Safari Camp, UAE", emoji: "🐪", nearbyLabel: "Desert experiences near Dubai" },
+  // Abu Dhabi
+  { name: "Sheikh Zayed Mosque", city: "Abu Dhabi", mapQuery: "Sheikh Zayed Grand Mosque, Abu Dhabi", emoji: "🕌", nearbyLabel: "Cultural sites near Sheikh Zayed Mosque" },
+  { name: "Louvre Abu Dhabi", city: "Abu Dhabi", mapQuery: "Louvre Abu Dhabi, UAE", emoji: "🎨", nearbyLabel: "Museums near Louvre Abu Dhabi" },
+  { name: "Ferrari World", city: "Abu Dhabi", mapQuery: "Ferrari World Abu Dhabi, Yas Island", emoji: "🏎️", nearbyLabel: "Theme parks on Yas Island" },
+  { name: "Yas Island", city: "Abu Dhabi", mapQuery: "Yas Island, Abu Dhabi, UAE", emoji: "🎢", nearbyLabel: "Attractions on Yas Island" },
+  { name: "Warner Bros World", city: "Abu Dhabi", mapQuery: "Warner Bros. World Abu Dhabi", emoji: "🦸", nearbyLabel: "Theme parks on Yas Island" },
+  // Singapore
+  { name: "Marina Bay Sands", city: "Singapore", mapQuery: "Marina Bay Sands, Singapore", emoji: "🏨", nearbyLabel: "Viewpoints near Marina Bay Sands" },
+  { name: "Gardens by the Bay", city: "Singapore", mapQuery: "Gardens by the Bay, Singapore", emoji: "🌿", nearbyLabel: "Parks near Gardens by the Bay" },
+  { name: "Sentosa Island", city: "Singapore", mapQuery: "Sentosa Island, Singapore", emoji: "🏖️", nearbyLabel: "Attractions on Sentosa Island" },
+  { name: "Universal Studios Singapore", city: "Singapore", mapQuery: "Universal Studios Singapore", emoji: "🎬", nearbyLabel: "Theme parks near Universal Studios Singapore" },
+  { name: "Merlion", city: "Singapore", mapQuery: "Merlion Park, Singapore", emoji: "🦁", nearbyLabel: "Sights near Merlion Park" },
+  // Bangkok
+  { name: "Grand Palace", city: "Bangkok", mapQuery: "Grand Palace, Bangkok, Thailand", emoji: "🏯", nearbyLabel: "Temples near Grand Palace Bangkok" },
+  { name: "Wat Pho", city: "Bangkok", mapQuery: "Wat Pho, Bangkok, Thailand", emoji: "🛕", nearbyLabel: "Temples near Wat Pho Bangkok" },
+  { name: "Chatuchak Market", city: "Bangkok", mapQuery: "Chatuchak Weekend Market, Bangkok", emoji: "🛒", nearbyLabel: "Markets near Chatuchak Bangkok" },
+  // Bali
+  { name: "Uluwatu Temple", city: "Bali", mapQuery: "Uluwatu Temple, Bali, Indonesia", emoji: "🛕", nearbyLabel: "Temples near Uluwatu Bali" },
+  { name: "Tanah Lot", city: "Bali", mapQuery: "Tanah Lot Temple, Bali, Indonesia", emoji: "🌊", nearbyLabel: "Sights near Tanah Lot Bali" },
+  { name: "Ubud", city: "Bali", mapQuery: "Ubud, Bali, Indonesia", emoji: "🌿", nearbyLabel: "Experiences in Ubud Bali" },
+  // Istanbul
+  { name: "Hagia Sophia", city: "Istanbul", mapQuery: "Hagia Sophia, Istanbul, Turkey", emoji: "🕌", nearbyLabel: "Sights near Hagia Sophia Istanbul" },
+  { name: "Blue Mosque", city: "Istanbul", mapQuery: "Blue Mosque, Istanbul, Turkey", emoji: "🕌", nearbyLabel: "Mosques near Blue Mosque Istanbul" },
+  { name: "Grand Bazaar", city: "Istanbul", mapQuery: "Grand Bazaar, Istanbul, Turkey", emoji: "🛍️", nearbyLabel: "Bazaars near Grand Bazaar Istanbul" },
+  // Cairo
+  { name: "Pyramids of Giza", city: "Cairo", mapQuery: "Pyramids of Giza, Egypt", emoji: "🏛️", nearbyLabel: "Ancient sites near Pyramids of Giza" },
+  { name: "Sphinx", city: "Cairo", mapQuery: "Great Sphinx of Giza, Egypt", emoji: "🦁", nearbyLabel: "Sights near the Sphinx Egypt" },
+  // Paris
+  { name: "Eiffel Tower", city: "Paris", mapQuery: "Eiffel Tower, Paris, France", emoji: "🗼", nearbyLabel: "Viewpoints near Eiffel Tower" },
+  { name: "Louvre", city: "Paris", mapQuery: "Louvre Museum, Paris, France", emoji: "🎨", nearbyLabel: "Museums near Louvre Paris" },
+  // London
+  { name: "Big Ben", city: "London", mapQuery: "Big Ben, Westminster, London, UK", emoji: "🕰️", nearbyLabel: "Sights near Big Ben London" },
+  { name: "Tower of London", city: "London", mapQuery: "Tower of London, UK", emoji: "🏰", nearbyLabel: "Historic sites near Tower of London" },
+  // New York
+  { name: "Statue of Liberty", city: "New York", mapQuery: "Statue of Liberty, New York, USA", emoji: "🗽", nearbyLabel: "Sights near Statue of Liberty" },
+  { name: "Times Square", city: "New York", mapQuery: "Times Square, New York, USA", emoji: "🌆", nearbyLabel: "Attractions near Times Square" },
+];
+
+export const LANDMARK_NAMES = LANDMARKS.map((l) => l.name.toLowerCase());

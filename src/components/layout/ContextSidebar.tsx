@@ -1,27 +1,34 @@
 "use client";
 
-import { useEffect, useRef, useMemo } from "react";
+import { useEffect, useRef } from "react";
+import Link from "next/link";
 import { FEATURED_DESTINATIONS } from "@/lib/constants";
+import type { ContextLandmark } from "@/lib/types";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  MapPin,
+  X,
+  Plus,
+  UserPlus,
+  Heart,
+  Star,
+  SlidersHorizontal,
+  DollarSign,
+} from "lucide-react";
 
 interface ContextSidebarProps {
   destination: string | null;
+  landmark?: ContextLandmark | null;
   searchQuery: string | null;
   isOpen: boolean;
   onClose: () => void;
   onSendPrompt: (text: string) => void;
 }
 
-const QUICK_ACTIONS = [
-  "City tours",
-  "Desert safari",
-  "Water activities",
-  "Sightseeing",
-  "Adventure tours",
-  "Cultural experiences",
-];
-
 export default function ContextSidebar({
   destination,
+  landmark,
   searchQuery,
   isOpen,
   onClose,
@@ -53,21 +60,8 @@ export default function ContextSidebar({
     };
   }, [isOpen, onClose]);
 
-  // Build the Google Maps embed query from user context
-  const mapQuery = useMemo(() => {
-    if (searchQuery && destination) {
-      return `${searchQuery} ${destination}`;
-    }
-    if (destination) {
-      return `things to do in ${destination}`;
-    }
-    return null;
-  }, [destination, searchQuery]);
-
-  const mapSrc = useMemo(() => {
-    if (!mapQuery) return null;
-    return `https://www.google.com/maps?q=${encodeURIComponent(mapQuery)}&output=embed&z=12`;
-  }, [mapQuery]);
+  const trendingDestinations = FEATURED_DESTINATIONS.slice(0, 6);
+  const inspirationDestinations = FEATURED_DESTINATIONS.slice(2, 6);
 
   return (
     <>
@@ -83,171 +77,213 @@ export default function ContextSidebar({
         ref={sidebarRef}
         className={[
           "flex flex-col",
-          // Mobile: fixed drawer from right
           "fixed inset-y-0 right-0 z-50 w-80",
-          // Desktop: static column
           "lg:relative lg:inset-auto lg:z-auto lg:w-96 lg:shrink-0",
-          // Theme
           "bg-[var(--bg-secondary)] border-l border-[var(--border-color)]",
           "transition-transform duration-300 ease-in-out",
-          // Desktop always visible, mobile slides
           "lg:translate-x-0",
           isOpen ? "translate-x-0" : "translate-x-full",
         ].join(" ")}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 py-4 border-b border-[var(--border-color)]">
+        {/* Top action bar */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-color)]">
           <div className="flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 text-[var(--accent)]">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
-            </svg>
-            <p className="text-xs font-bold text-[var(--text-primary)] tracking-tight">
-              {destination ? destination : "Explore Map"}
-            </p>
+            <Button
+              size="sm"
+              className="bg-[var(--brand-accent)] text-[var(--bg-primary)] rounded-lg text-xs font-semibold px-3 gap-1.5"
+              render={<Link href="/trip-planner" />}
+            >
+              <Plus className="size-3.5" />
+              Create a Trip
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-lg text-xs font-medium px-3 gap-1.5 border-[var(--border-color)]"
+            >
+              <UserPlus className="size-3.5" />
+              Invite
+            </Button>
           </div>
-          {/* Close button — mobile only */}
-          <button
+          <Button
+            variant="ghost"
+            size="icon-xs"
             onClick={onClose}
-            className="lg:hidden p-1.5 rounded-lg hover:bg-[var(--bg-card)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+            className="lg:hidden text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
             aria-label="Close sidebar"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-              className="w-4 h-4"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
+            <X className="size-4" />
+          </Button>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto scrollbar-thin flex flex-col">
-          {mapSrc ? (
-            <>
-              {/* Map fills available space */}
-              <div className="relative w-full flex-1" style={{ minHeight: "350px" }}>
-                <iframe
-                  key={mapSrc}
-                  src={mapSrc}
-                  className="absolute inset-0 w-full h-full border-0"
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title={`Map of ${destination || "location"}`}
-                />
-              </div>
-
-              {/* Quick actions below map */}
-              {destination && (
-                <div className="px-4 pt-4 pb-3 border-t border-[var(--border-color)] shrink-0">
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-secondary)] opacity-60 mb-2">
-                    Explore more
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {QUICK_ACTIONS.map((action) => (
-                      <button
-                        key={action}
-                        onClick={() => {
-                          onSendPrompt(`${action} in ${destination}`);
-                          onClose();
-                        }}
-                        className="text-[11px] px-3 py-1.5 rounded-full bg-[var(--bg-card)] hover:bg-[var(--bg-card-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors font-medium"
-                      >
-                        {action}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </>
-          ) : (
-            /* Default state — no destination detected yet */
-            <div className="p-4 space-y-6">
-              {/* Default map showing Dubai overview */}
-              <div className="relative w-full rounded-xl overflow-hidden" style={{ height: "200px" }}>
-                <iframe
-                  src={`https://www.google.com/maps?q=${encodeURIComponent("Dubai tourist attractions")}&output=embed&z=11`}
-                  className="absolute inset-0 w-full h-full border-0"
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title="Default map"
-                />
-              </div>
-
-              {/* Get started */}
-              <div>
-                <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-2">
-                  Get started
-                </h3>
-                <p className="text-xs text-[var(--text-secondary)] mb-4">
-                  Ask about a destination to see it on the map.
-                </p>
-                <div className="flex flex-wrap gap-1.5">
-                  {QUICK_ACTIONS.slice(0, 4).map((action) => (
-                    <button
-                      key={action}
-                      onClick={() => {
-                        onSendPrompt(`${action} in Dubai`);
-                        onClose();
-                      }}
-                      className="text-[11px] px-3 py-1.5 rounded-full bg-[var(--bg-card)] hover:bg-[var(--bg-card-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors font-medium"
-                    >
-                      {action}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Featured destinations */}
-              <div>
-                <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-3">
-                  Popular destinations
-                </h3>
-                <div className="grid grid-cols-2 gap-2">
-                  {FEATURED_DESTINATIONS.map((dest) => (
-                    <button
-                      key={dest.name}
-                      onClick={() => {
-                        onSendPrompt(`Show me tours in ${dest.name}`);
-                        onClose();
-                      }}
-                      className="relative h-20 rounded-xl overflow-hidden bg-[var(--bg-card)] hover:bg-[var(--bg-card-hover)] border border-[var(--border-color)] transition-all group"
-                    >
-                      <img
-                        src={dest.image}
-                        alt={dest.name}
-                        crossOrigin="anonymous"
-                        className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity"
-                        onError={(e) => {
-                          const img = e.target as HTMLImageElement;
-                          img.style.display = "none";
-                          img.parentElement!.style.background =
-                            "linear-gradient(135deg, #1a365d 0%, #2d3748 100%)";
-                        }}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-black/10" />
-                      <div className="absolute bottom-2 left-2.5 flex items-center gap-1.5">
-                        <span className="text-sm">{dest.emoji}</span>
-                        <span className="text-xs font-semibold text-white">
-                          {dest.name}
-                        </span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
+        {/* Filter tags row */}
+        <div
+          className="flex items-center gap-2 px-4 py-3 overflow-x-auto"
+          style={{ scrollbarWidth: "none" }}
+        >
+          {destination && (
+            <Badge
+              variant="secondary"
+              className="rounded-full px-3 py-1.5 text-xs font-medium bg-[var(--bg-card)] text-[var(--text-primary)] border border-[var(--border-color)] shrink-0 h-auto gap-1"
+            >
+              <MapPin className="size-3" />
+              {destination}
+            </Badge>
           )}
+          <Badge
+            variant="secondary"
+            className="rounded-full px-3 py-1.5 text-xs font-medium bg-[var(--accent-green)]/10 text-[var(--accent-green)] border border-[var(--accent-green)]/20 shrink-0 cursor-pointer h-auto gap-1"
+          >
+            <DollarSign className="size-3" />
+            On a Budget
+            <button className="ml-1 hover:text-[var(--text-primary)]">
+              <X className="size-3" />
+            </button>
+          </Badge>
+          <Badge
+            variant="secondary"
+            className="rounded-full px-3 py-1.5 text-xs font-medium bg-[var(--bg-card)] text-[var(--text-secondary)] border border-[var(--border-color)] shrink-0 cursor-pointer hover:text-[var(--text-primary)] h-auto gap-1"
+          >
+            <SlidersHorizontal className="size-3" />
+            Filters
+          </Badge>
+        </div>
+
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto scrollbar-thin">
+          {/* Trending Destinations */}
+          <div className="px-4 pt-2 pb-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-[var(--text-primary)]">
+                Trending Destinations
+              </h3>
+              <button className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-medium transition-colors">
+                Explore
+              </button>
+            </div>
+
+            {/* Horizontal scrollable cards */}
+            <div
+              className="flex gap-3 overflow-x-auto pb-2"
+              style={{ scrollbarWidth: "none" }}
+            >
+              {trendingDestinations.map((dest) => (
+                <button
+                  key={dest.name}
+                  onClick={() => {
+                    onSendPrompt(`Show me tours in ${dest.name}`);
+                    onClose();
+                  }}
+                  className="relative flex-shrink-0 w-36 h-44 rounded-2xl overflow-hidden group"
+                >
+                  <img
+                    src={dest.image}
+                    alt={dest.name}
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                    onError={(e) => {
+                      const img = e.target as HTMLImageElement;
+                      img.style.display = "none";
+                      img.parentElement!.style.background =
+                        "linear-gradient(135deg, #1a365d 0%, #2d3748 100%)";
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+
+                  {/* Heart & share icons */}
+                  <div className="absolute top-2 right-2 flex gap-1.5">
+                    <div className="w-7 h-7 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-colors">
+                      <Heart className="size-3.5 text-white" />
+                    </div>
+                  </div>
+
+                  {/* Emoji badge */}
+                  <div className="absolute top-2 left-2">
+                    <div className="w-7 h-7 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                      <span className="text-sm">{dest.emoji}</span>
+                    </div>
+                  </div>
+
+                  {/* Bottom info */}
+                  <div className="absolute bottom-3 left-3 right-3 text-left">
+                    <p className="text-sm font-semibold text-white">
+                      {dest.name}
+                    </p>
+                    <div className="flex items-center gap-1 mt-0.5">
+                      <Star className="size-3 text-amber-400 fill-amber-400" />
+                      <span className="text-xs text-white/80">4.4</span>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Get inspiration section */}
+          <div className="px-4 pt-2 pb-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-[var(--text-primary)]">
+                Get inspiration for your next trip
+              </h3>
+              <button className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-medium transition-colors">
+                Explore
+              </button>
+            </div>
+
+            {/* 2-column card grid */}
+            <div className="grid grid-cols-2 gap-3">
+              {inspirationDestinations.map((dest) => (
+                <button
+                  key={`insp-${dest.name}`}
+                  onClick={() => {
+                    onSendPrompt(`Tours in ${dest.name}`);
+                    onClose();
+                  }}
+                  className="flex flex-col rounded-2xl overflow-hidden border border-[var(--border-color)] bg-[var(--bg-card)] hover:bg-[var(--bg-card-hover)] transition-all group text-left"
+                >
+                  <div className="relative h-24 w-full overflow-hidden">
+                    <img
+                      src={dest.image}
+                      alt={dest.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                      onError={(e) => {
+                        const img = e.target as HTMLImageElement;
+                        img.style.display = "none";
+                        img.parentElement!.style.background =
+                          "linear-gradient(135deg, #1a365d 0%, #2d3748 100%)";
+                      }}
+                    />
+                    <div className="absolute top-2 right-2">
+                      <div className="w-6 h-6 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                        <Heart className="size-3 text-white" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-2.5">
+                    <Badge
+                      variant="secondary"
+                      className="text-[10px] px-1.5 py-0 rounded-md bg-[var(--bg-card-hover)] text-[var(--text-secondary)] mb-1.5 h-auto font-medium"
+                    >
+                      {dest.emoji} Hotel
+                    </Badge>
+                    <p className="text-xs font-semibold text-[var(--text-primary)] line-clamp-1">
+                      {dest.name}
+                    </p>
+                    <div className="flex items-center gap-1 mt-0.5">
+                      <Star className="size-2.5 text-amber-400 fill-amber-400" />
+                      <span className="text-[10px] text-[var(--text-secondary)]">
+                        4.4
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-[var(--text-tertiary)] mt-1 line-clamp-2">
+                      Beautiful destination with amazing tours and experiences.
+                    </p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </aside>
     </>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const fallbackMessages = [
   "Just a sec...",
@@ -17,7 +18,6 @@ interface TypingIndicatorProps {
 export default function TypingIndicator({ status }: TypingIndicatorProps) {
   const [fallbackIndex, setFallbackIndex] = useState(0);
 
-  // Only cycle through fallback messages when no real status is provided
   useEffect(() => {
     if (status) return;
     const interval = setInterval(() => {
@@ -30,12 +30,21 @@ export default function TypingIndicator({ status }: TypingIndicatorProps) {
   const key = status || `fallback-${fallbackIndex}`;
 
   return (
-    <div className="flex justify-start message-enter">
-      <div className="flex items-center gap-2 py-2">
-        <div className="w-4 h-4 relative flex items-center justify-center">
-          <div className="w-2 h-2 bg-[var(--accent)] rounded-full animate-ping opacity-40 absolute" />
-          <div className="w-2 h-2 bg-[var(--accent)] rounded-full relative" />
+    <div className="flex items-start gap-3 message-enter">
+      <Avatar className="size-7 shrink-0 border border-[var(--border-color)] shadow-sm">
+        <AvatarFallback className="bg-[var(--bg-card)] text-[var(--text-secondary)] text-[10px] font-bold">
+          R
+        </AvatarFallback>
+      </Avatar>
+
+      <div className="flex items-center gap-3 py-2">
+        {/* Animated typing dots */}
+        <div className="flex items-center gap-1">
+          <span className="typing-dot size-1.5 rounded-full bg-[var(--text-tertiary)]" />
+          <span className="typing-dot size-1.5 rounded-full bg-[var(--text-tertiary)]" />
+          <span className="typing-dot size-1.5 rounded-full bg-[var(--text-tertiary)]" />
         </div>
+
         <span className="text-sm text-[var(--text-secondary)] animate-fade-in" key={key}>
           {displayText}
         </span>

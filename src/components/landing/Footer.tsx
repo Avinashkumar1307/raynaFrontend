@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useTheme } from "@/hooks/useTheme";
 import { SUPPORTED_DESTINATIONS } from "@/lib/constants";
+import { Sparkles } from "lucide-react";
 
 export default function Footer() {
   const { theme } = useTheme();
@@ -20,9 +21,16 @@ export default function Footer() {
                 className="h-8 w-auto"
               />
             </Link>
-            <p className="text-sm text-[var(--text-secondary)] leading-relaxed max-w-xs">
+            <p className="text-sm text-[var(--text-secondary)] leading-relaxed max-w-xs mb-4">
               Your AI-powered travel companion. Discover, plan, and book amazing tours and activities worldwide.
             </p>
+            <Link
+              href="/chat"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--bg-card)] border border-[var(--border-color)] text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)] transition-colors"
+            >
+              <Sparkles className="size-4 text-amber-500" />
+              Try AI Assistant
+            </Link>
           </div>
 
           {/* Destinations */}
@@ -115,9 +123,10 @@ export default function Footer() {
           <p className="text-xs text-[var(--text-secondary)]">
             &copy; {new Date().getFullYear()} Rayna Tours. All rights reserved.
           </p>
-          <p className="text-xs text-[var(--text-tertiary)]">
+          <div className="flex items-center gap-1.5 text-xs text-[var(--text-tertiary)]">
+            <Sparkles className="size-3 text-amber-500" />
             Powered by AI
-          </p>
+          </div>
         </div>
       </div>
     </footer>
