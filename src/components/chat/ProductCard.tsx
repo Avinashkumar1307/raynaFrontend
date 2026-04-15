@@ -1,9 +1,10 @@
 "use client";
 
-import type { ProductCard as ProductCardType, ProductCardType as CardType } from "@/lib/types";
+import type { ProductCard as ProductCardType, ProductCardType as CardType, SavedItem } from "@/lib/types";
 import { useCart } from "@/context/CartContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import SaveButton from "@/components/ui/SaveButton";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -39,6 +40,25 @@ export default function ProductCard({ card, cardType }: Props) {
     ? Math.round(((card.originalPrice - card.currentPrice) / card.originalPrice) * 100)
     : 0;
   const bookingUrl = card.url || "https://www.raynatours.com";
+
+  const savedItem: SavedItem = {
+    id: String(card.id),
+    title: card.title,
+    image: card.image,
+    location: card.location,
+    category: card.category,
+    price: card.currentPrice,
+    originalPrice: card.originalPrice,
+    currency: card.currency,
+    url: bookingUrl,
+    duration: card.duration,
+    type: cartTypeMap[cardType] ?? "tour",
+    rating: card.rating,
+    reviewCount: card.reviewCount,
+    highlights: card.highlights,
+    amenities: card.amenities,
+    savedAt: 0,
+  };
 
   function handleCartClick(e: React.MouseEvent) {
     e.preventDefault();
@@ -90,9 +110,12 @@ export default function ProductCard({ card, cardType }: Props) {
           ) : (
             <span />
           )}
-          <Badge variant="secondary" className="bg-black/50 backdrop-blur-sm text-white text-[11px] font-semibold px-3 py-0.5 rounded-full border-0">
-            {label}
-          </Badge>
+          <div className="flex items-center gap-1.5">
+            <SaveButton item={savedItem} />
+            <Badge variant="secondary" className="bg-black/50 backdrop-blur-sm text-white text-[11px] font-semibold px-3 py-0.5 rounded-full border-0">
+              {label}
+            </Badge>
+          </div>
         </div>
 
         {/* Bottom info */}

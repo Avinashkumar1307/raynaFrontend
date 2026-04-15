@@ -9,12 +9,14 @@ import ChatPanel from "@/components/layout/ChatPanel";
 import HistorySidebar from "@/components/layout/HistorySidebar";
 import ContextSidebar from "@/components/layout/ContextSidebar";
 import CartDrawer from "@/components/layout/CartDrawer";
+import SavedDrawer from "@/components/layout/SavedDrawer";
 import { CartProvider } from "@/context/CartContext";
 
 function ChatContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [rightSidebarOpen, setRightSidebarOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+  const [savedOpen, setSavedOpen] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
   const searchParams = useSearchParams();
   const hasAutoSent = useRef(false);
@@ -114,6 +116,7 @@ function ChatContent() {
   return (
     <main className="flex h-screen bg-[var(--bg-primary)] overflow-hidden transition-colors duration-300">
       <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
+      <SavedDrawer isOpen={savedOpen} onClose={() => setSavedOpen(false)} />
       <HistorySidebar
         conversations={conversations}
         currentSessionId={currentSessionId}
@@ -143,6 +146,7 @@ function ChatContent() {
           onOpenSidebar={() => setSidebarOpen(true)}
           onOpenContextSidebar={() => setRightSidebarOpen(true)}
           onOpenCart={() => setCartOpen(true)}
+          onOpenSaved={() => setSavedOpen(true)}
           voiceEnabled={voiceEnabled}
           onToggleVoice={toggleVoice}
           isPlaying={isPlaying}

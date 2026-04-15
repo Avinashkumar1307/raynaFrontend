@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Inter, Geist } from "next/font/google";
 import "./globals.css";
 import ThemeProvider from "@/components/layout/ThemeProvider";
+import { SavedProvider } from "@/context/SavedContext";
+import { TripProvider } from "@/context/TripContext";
+import { FilterProvider } from "@/context/FilterContext";
 import { cn } from "@/lib/utils";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
@@ -51,7 +54,13 @@ export default function RootLayout({
       </head>
       <body className={`${inter.className} antialiased bg-[var(--bg-primary)] text-[var(--text-primary)] transition-colors duration-300`}>
         <ThemeProvider>
-          {children}
+          <SavedProvider>
+            <TripProvider>
+              <FilterProvider>
+                {children}
+              </FilterProvider>
+            </TripProvider>
+          </SavedProvider>
         </ThemeProvider>
       </body>
     </html>

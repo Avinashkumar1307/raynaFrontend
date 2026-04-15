@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Link from "next/link";
 import { FEATURED_DESTINATIONS } from "@/lib/constants";
 import type { ContextLandmark } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -90,6 +91,7 @@ export default function ContextSidebar({
             <Button
               size="sm"
               className="bg-[var(--brand-accent)] text-[var(--bg-primary)] rounded-lg text-xs font-semibold px-3 gap-1.5"
+              render={<Link href="/trip-planner" />}
             >
               <Plus className="size-3.5" />
               Create a Trip

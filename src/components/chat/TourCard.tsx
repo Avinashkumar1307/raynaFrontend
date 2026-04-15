@@ -1,9 +1,10 @@
 "use client";
 
-import type { TourCard as TourCardType } from "@/lib/types";
+import type { TourCard as TourCardType, SavedItem } from "@/lib/types";
 import { useCart } from "@/context/CartContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import SaveButton from "@/components/ui/SaveButton";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -20,6 +21,24 @@ export default function TourCard({ card }: Props) {
 
   const hasDiscount =
     card.originalPrice && card.currentPrice && card.originalPrice > card.currentPrice;
+
+  const savedItem: SavedItem = {
+    id: String(card.id),
+    title: card.title,
+    image: card.image,
+    location: card.location,
+    category: card.category,
+    price: card.currentPrice,
+    originalPrice: card.originalPrice ?? undefined,
+    currency: card.currency,
+    url: card.url,
+    duration: card.duration,
+    type: "tour",
+    rating: card.rating,
+    reviewCount: card.reviewCount,
+    highlights: card.highlights,
+    savedAt: 0,
+  };
 
   function handleCartClick(e: React.MouseEvent) {
     e.preventDefault();
@@ -81,9 +100,12 @@ export default function TourCard({ card }: Props) {
           ) : (
             <span />
           )}
-          <Badge variant="secondary" className="bg-black/50 backdrop-blur-sm text-white text-[11px] font-semibold px-3 py-0.5 rounded-full border-0">
-            {card.isNew ? "New" : "Tour"}
-          </Badge>
+          <div className="flex items-center gap-1.5">
+            <SaveButton item={savedItem} />
+            <Badge variant="secondary" className="bg-black/50 backdrop-blur-sm text-white text-[11px] font-semibold px-3 py-0.5 rounded-full border-0">
+              {card.isNew ? "New" : "Tour"}
+            </Badge>
+          </div>
         </div>
 
         {/* Bottom info */}

@@ -1,14 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import type { Message } from "@/lib/types";
 import MessageList from "@/components/chat/MessageList";
 import ChatInput from "@/components/chat/ChatInput";
 import TypingIndicator from "@/components/chat/TypingIndicator";
 import NewChatButton from "@/components/chat/NewChatButton";
 import QuickPrompts from "@/components/ui/QuickPrompts";
+import TopFilterBar from "@/components/filters/TopFilterBar";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import { useCart } from "@/context/CartContext";
+import { useFilters } from "@/context/FilterContext";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -16,7 +18,8 @@ import {
   TooltipTrigger,
   TooltipProvider,
 } from "@/components/ui/tooltip";
-import { Menu, Map, ShoppingCart } from "lucide-react";
+import { Menu, Map, ShoppingCart, Heart } from "lucide-react";
+import { useSaved } from "@/context/SavedContext";
 
 interface ChatPanelProps {
   messages: Message[];
@@ -32,6 +35,7 @@ interface ChatPanelProps {
   onOpenSidebar: () => void;
   onOpenContextSidebar?: () => void;
   onOpenCart?: () => void;
+  onOpenSaved?: () => void;
   voiceEnabled?: boolean;
   onToggleVoice?: () => void;
   isPlaying?: boolean;
@@ -56,6 +60,7 @@ export default function ChatPanel({
   onOpenSidebar,
   onOpenContextSidebar,
   onOpenCart,
+  onOpenSaved,
   voiceEnabled = false,
   isPlaying = false,
   isTTSLoading = false,
@@ -63,6 +68,38 @@ export default function ChatPanel({
 }: ChatPanelProps) {
   const [animatingIndex, setAnimatingIndex] = useState<number | null>(null);
   const { totalItems } = useCart();
+  const { totalSaved } = useSaved();
+  const { filters, hasActiveFilters } = useFilters();
+
+  // Enrich message with active filter context
+  const handleSendWithFilters = useCallback(
+    (content: string) => {
+      if (!hasActiveFilters) {
+        onSendMessage(content);
+        return;
+      }
+      const parts: string[] = [];
+      if (filters.destination) parts.push(`in ${filters.destination}`);
+      if (filters.dateRange.start || filters.dateRange.end) {
+        const from = filters.dateRange.start || "";
+        const to = filters.dateRange.end || "";
+        if (from && to) parts.push(`from ${from} to ${to}`);
+        else if (from) parts.push(`starting ${from}`);
+        else if (to) parts.push(`until ${to}`);
+      }
+      if (filters.travelers > 1) parts.push(`for ${filters.travelers} travelers`);
+      if (filters.budgetRange.min !== null || filters.budgetRange.max !== null) {
+        const min = filters.budgetRange.min;
+        const max = filters.budgetRange.max;
+        if (min !== null && max !== null) parts.push(`with budget $${min}-$${max}`);
+        else if (min !== null) parts.push(`with budget $${min}+`);
+        else if (max !== null) parts.push(`with budget up to $${max}`);
+      }
+      const filterSuffix = parts.length > 0 ? ` (${parts.join(", ")})` : "";
+      onSendMessage(content + filterSuffix);
+    },
+    [onSendMessage, filters, hasActiveFilters]
+  );
 
   useEffect(() => {
     setAnimatingIndex(null);
@@ -124,6 +161,29 @@ export default function ChatPanel({
                 <TooltipContent>Explore tours</TooltipContent>
               </Tooltip>
             )}
+            {onOpenSaved && (
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={onOpenSaved}
+                      className="relative text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                      aria-label="Saved items"
+                    />
+                  }
+                >
+                  <Heart className="size-5" />
+                  {totalSaved > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 leading-none">
+                      {totalSaved}
+                    </span>
+                  )}
+                </TooltipTrigger>
+                <TooltipContent>Saved items</TooltipContent>
+              </Tooltip>
+            )}
             {onOpenCart && (
               <Tooltip>
                 <TooltipTrigger
@@ -153,11 +213,14 @@ export default function ChatPanel({
         </div>
       </TooltipProvider>
 
+      {/* Filter Bar */}
+      <TopFilterBar />
+
       {/* Messages area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {messages.length === 0 ? (
           <div className="flex-1 overflow-y-auto">
-            <QuickPrompts onSelect={onSendMessage} />
+            <QuickPrompts onSelect={handleSendWithFilters} />
           </div>
         ) : (
           <div className="flex-1 flex flex-col min-h-0">
@@ -166,7 +229,7 @@ export default function ChatPanel({
               animatingIndex={animatingIndex}
               shouldScrollToBottom={shouldScrollToBottom}
               onScrollTriggered={onScrollConsumed}
-              onSendMessage={onSendMessage}
+              onSendMessage={handleSendWithFilters}
               isLoading={isLoading}
             />
             {isLoading && (
@@ -190,7 +253,7 @@ export default function ChatPanel({
       )}
 
       <ChatInput
-        onSend={onSendMessage}
+        onSend={handleSendWithFilters}
         disabled={isLoading}
         voiceEnabled={voiceEnabled}
         isPlaying={isPlaying}

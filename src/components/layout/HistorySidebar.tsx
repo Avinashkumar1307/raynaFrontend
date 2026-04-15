@@ -31,8 +31,11 @@ import {
   Compass,
   Map,
   Settings,
+  Heart,
+  CalendarDays,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 interface HistorySidebarProps {
   conversations: ConversationSummary[];
@@ -63,10 +66,10 @@ function formatRelativeTime(dateStr: string): string {
 }
 
 const NAV_ICONS = [
-  { icon: MessageSquare, label: "Chats", active: true },
-  { icon: Compass, label: "Explore", active: false },
-  { icon: Map, label: "Map", active: false },
-  { icon: Settings, label: "Settings", active: false },
+  { icon: MessageSquare, label: "Chats", href: "/chat", active: true },
+  { icon: Compass, label: "Explore", href: "/", active: false },
+  { icon: CalendarDays, label: "Trip Planner", href: "/trip-planner", active: false },
+  { icon: Map, label: "Map", href: "/trip-planner", active: false },
 ];
 
 function ConversationItem({
@@ -258,9 +261,9 @@ export default function HistorySidebar({
       <aside
         ref={sidebarRef}
         className={cn(
-          "flex flex-row",
+          "flex flex-row h-full",
           "fixed inset-y-0 left-0 z-50 w-80",
-          "md:relative md:inset-auto md:z-auto md:w-[304px] md:shrink-0",
+          "md:relative md:inset-auto md:z-auto md:w-[304px] md:shrink-0 md:h-screen",
           "bg-[var(--bg-secondary)] border-r border-[var(--border-color)]",
           "transition-colors duration-300",
           "transform transition-transform duration-300 ease-in-out",
@@ -277,11 +280,12 @@ export default function HistorySidebar({
             </div>
 
             {/* Nav icons */}
-            {NAV_ICONS.map(({ icon: Icon, label, active }) => (
+            {NAV_ICONS.map(({ icon: Icon, label, href, active }) => (
               <Tooltip key={label}>
                 <TooltipTrigger
                   render={
-                    <button
+                    <Link
+                      href={href}
                       className={cn(
                         "w-10 h-10 rounded-xl flex items-center justify-center transition-colors",
                         active
@@ -307,7 +311,7 @@ export default function HistorySidebar({
         </TooltipProvider>
 
         {/* Main Sidebar Content */}
-        <div className="flex flex-col flex-1 min-w-0">
+        <div className="flex flex-col flex-1 min-w-0 min-h-0 overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between px-4 pt-4 pb-2">
             <div className="flex items-center gap-2">
@@ -383,7 +387,7 @@ export default function HistorySidebar({
           </div>
 
           {/* Conversation list */}
-          <ScrollArea className="flex-1 py-1">
+          <div className="flex-1 overflow-y-auto py-1">
             {!isAvailable ? (
               <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
                 <div className="w-14 h-14 rounded-2xl bg-[var(--bg-card)] flex items-center justify-center mb-4">
@@ -441,7 +445,7 @@ export default function HistorySidebar({
                 )}
               </>
             )}
-          </ScrollArea>
+          </div>
 
           {/* Footer: + New Chat button */}
           <div className="p-3 mt-auto border-t border-[var(--border-color)]">

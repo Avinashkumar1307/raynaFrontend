@@ -178,3 +178,112 @@ export interface CartItem {
   type: 'tour' | 'holiday' | 'cruise' | 'yacht';
 }
 
+// ====== SAVED/BOOKMARK TYPES ======
+export interface SavedItem {
+  id: string;
+  title: string;
+  image: string;
+  location: string;
+  category: string;
+  price: number;
+  originalPrice?: number;
+  currency: string;
+  url: string;
+  duration?: string;
+  type: 'tour' | 'holiday' | 'cruise' | 'yacht';
+  rating?: number;
+  reviewCount?: number;
+  highlights?: string[];
+  amenities?: string[];
+  savedAt: number;
+}
+
+// ====== TRIP PLANNER TYPES ======
+export interface TripActivity {
+  id: string;
+  title: string;
+  image?: string;
+  location: string;
+  price: number;
+  currency: string;
+  duration?: string;
+  type: 'tour' | 'holiday' | 'cruise' | 'yacht' | 'activity' | 'restaurant';
+  startTime?: string;
+  endTime?: string;
+  notes?: string;
+  lat?: number;
+  lng?: number;
+  mapQuery?: string;
+}
+
+export interface TripHotel {
+  id: string;
+  name: string;
+  image?: string;
+  location: string;
+  pricePerNight: number;
+  currency: string;
+  checkIn?: string;
+  checkOut?: string;
+  lat?: number;
+  lng?: number;
+  mapQuery?: string;
+}
+
+export interface TripFlight {
+  id: string;
+  airline?: string;
+  flightNumber?: string;
+  departure: string;
+  arrival: string;
+  departureTime?: string;
+  arrivalTime?: string;
+  price: number;
+  currency: string;
+}
+
+export interface TripDay {
+  id: string;
+  dayNumber: number;
+  date?: string;
+  activities: TripActivity[];
+  hotel?: TripHotel;
+  flight?: TripFlight;
+}
+
+export interface Trip {
+  id: string;
+  name: string;
+  destination: string;
+  startDate?: string;
+  endDate?: string;
+  travelers: number;
+  days: TripDay[];
+  createdAt: number;
+  updatedAt: number;
+}
+
+// ====== FILTER TYPES ======
+export interface TripFilters {
+  destination: string | null;
+  dateRange: { start: string | null; end: string | null };
+  travelers: number;
+  budgetRange: { min: number | null; max: number | null };
+}
+
+// ====== MAP TYPES ======
+export type MapServiceFilter = 'all' | 'tours' | 'hotels' | 'activities' | 'restaurants';
+
+export interface MapPin {
+  id: string;
+  lat: number;
+  lng: number;
+  title: string;
+  description?: string;
+  type: MapServiceFilter;
+  image?: string;
+  price?: number;
+  currency?: string;
+  time?: string;
+}
+
